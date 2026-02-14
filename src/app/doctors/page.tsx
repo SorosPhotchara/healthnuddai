@@ -196,12 +196,6 @@ export default function DoctorsPage() {
           </div>
         )}
       </div>
-
-      {/* Footer */}
-      <footer className={styles.footer}>
-        <p>© 2026 Software Development | สุขภาพนัดได้</p>
-        <p>Present by Group 3</p>
-      </footer>
     </div>
   );
 }

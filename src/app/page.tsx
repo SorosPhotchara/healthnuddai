@@ -67,7 +67,7 @@ export default function Dashboard() {
 
           <div className={styles.promoSection}>
             <Image
-              src="/news.png"
+              src="/news.jpg"
               alt="ประชาสัมพันธ์"
               width={1200}
               height={600}

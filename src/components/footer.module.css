@@ -1,0 +1,17 @@
+.footer {
+  background-color: #48bb98;
+  color: white;
+  padding: 20px 0;
+  text-align: center;
+}
+
+.bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.groupText {
+  font-size: 14px;
+  color: white;
+}
