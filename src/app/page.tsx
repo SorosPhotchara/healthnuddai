@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { useAuthStore } from "@/lib/auth";
 import styles from "./dashboard.module.css";
+import Image from "next/image";
 
 export default function Dashboard() {
   const { user, isLoading, load_user } = useAuthStore();
@@ -50,29 +51,45 @@ export default function Dashboard() {
         <main className={styles.mainContent}>
           <div className={styles.welcomeCard}>
             <h1 className={styles.welcomeTitle}>
-              {user ? `สวัสดี, ${user.fname}!` : "ยินดีต้อนรับ!"}
+              {"จองคิวออนไลน์ ง่ายนิดเดียว"}
             </h1>
-            <p className={styles.welcomeSubtitle}>
-              {user
-                ? "ยินดีต้อนรับกลับมา วันนี้คุณต้องการนัดหมายอะไรไหม?"
-                : "เข้าสู่ระบบเพื่อจัดการนัดหมายของคุณ"
-              }
-            </p>
+
+            <div className={styles.welcomeRow}>
+              <p className={styles.welcomeSubtitle}>
+                {"ไม่ต้องรอ ไม่ต้องเสียเวลา จองล่วงหน้าได้ที่บ้าน"}
+              </p>
+
+              <Link href="/book" className={styles.bookNowButton}>
+                จองนัดเลย
+              </Link>
+            </div>
+          </div>
+
+          <div className={styles.promoSection}>
+            <Image
+              src="/news.png"
+              alt="ประชาสัมพันธ์"
+              width={1200}
+              height={600}
+              className={styles.promoImage}
+            />
           </div>
 
           <div className={styles.statsGrid}>
-            <div className={styles.statCard}>
-              <div className={styles.statNumber}>0</div>
-              <div className={styles.statLabel}>นัดหมายที่รอดำเนินการ</div>
-            </div>
-            <div className={styles.statCard}>
-              <div className={styles.statNumber}>0</div>
-              <div className={styles.statLabel}>นัดหมายที่ยืนยันแล้ว</div>
-            </div>
-            <div className={styles.statCard}>
-              <div className={styles.statNumber}>0</div>
-              <div className={styles.statLabel}>นัดหมายที่เสร็จสิ้น</div>
-            </div>
+            <Link href="/book" className={styles.statCard}>
+              <div className={styles.statNumber}>📅</div>
+              <div className={styles.statLabel}>จองนัดหมาย</div>
+            </Link>
+
+            <Link href="/book" className={styles.statCard}>
+              <div className={styles.statNumber}>🗒️</div>
+              <div className={styles.statLabel}>ตรวจสอบนัด</div>
+            </Link>
+
+            <Link href="/book" className={styles.statCard}>
+              <div className={styles.statNumber}>⌛️</div>
+              <div className={styles.statLabel}>คิวเรียลไทม์</div>
+            </Link>
           </div>
 
           <div className={styles.appointmentsCard}>

@@ -135,22 +135,53 @@
 }
 
 .welcomeCard {
-  background: linear-gradient(135deg, #48bb98 0%, #6dd5b8 100%);
-  border-radius: 24px;
-  padding: 2rem;
-  color: white;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  background: none;
 }
 
 .welcomeTitle {
-  font-size: 1.75rem;
+  font-size: 55px;
   font-weight: 700;
   margin-bottom: 0.5rem;
+  color: black;
 }
 
 .welcomeSubtitle {
-  font-size: 1rem;
+  font-size: 20px;
   opacity: 0.9;
+  color: black;
+}
+
+.welcomeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  gap: 20px;
+}
+
+.bookNowButton {
+  background-color: #48bb98;
+  color: white;
+  padding: 8px 18px;
+  border-radius: 13px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.2s ease;
+  white-space: nowrap;
+}
+
+.bookNowButton:hover {
+  background-color: #0059c1;
+}
+
+.promoSection {
+  margin-top: 10px;
+}
+
+.promoImage {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
 }
 
 .statsGrid {
@@ -160,23 +191,31 @@
 }
 
 .statCard {
-  background: white;
+  background: #48bb98;
+  padding: 25px 20px;
   border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   text-align: center;
+  text-decoration: none;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.statCard:hover {
+  transform: translateY(-4px);
+  transition: 0.2s ease;
 }
 
 .statNumber {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #48bb98;
+  font-size: 20px;
 }
 
 .statLabel {
-  font-size: 0.875rem;
-  color: #718096;
+  font-size: 16px;
+  color: white;
   margin-top: 0.5rem;
+  font-weight: 700;
 }
 
 .appointmentsCard {
