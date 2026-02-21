@@ -96,7 +96,7 @@ export default function BookingPage() {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (formData.idNumber.length === 13) {
+      if (formData.idNumber.length === 13 && formData.idNumber === user?.identification_number) {
         try {
           const response = await fetch(`/api/users/check?id=${formData.idNumber}`);
 
@@ -118,11 +118,17 @@ export default function BookingPage() {
         } catch (error) {
           console.error("Error fetching user data:", error);
         }
+      } else if (formData.idNumber.length === 13 && formData.idNumber !== user?.identification_number) {
+        setFormData(prev => ({
+          ...prev,
+          title: "", firstName: "", lastName: "", phone: "", sex: "", birthDate: ""
+        }));
       }
     };
 
     fetchUserData();
-  }, [formData.idNumber]);
+  }, [formData.idNumber, user?.identification_number]);
+
 
   // ฟังก์ชันสร้างปฏิทิน
   const getDaysInMonth = (date: Date) => {
