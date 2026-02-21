@@ -4,15 +4,17 @@ import Link from "next/link";
 import { useState } from "react";
 import styles from "./register.module.css";
 
+
 const title_OPTIONS = ["นาย", "นาง", "นางสาว"] as const;
+
+
 const sex_OPTIONS = [
-  { value: "M", label: "Male" },
-  { value: "F", label: "Female" },
-  { value: "O", label: "Other" },
+  { value: "M", label: "ชาย" },
+  { value: "F", label: "หญิง" },
 ] as const;
 
 export default function RegisterPage() {
-  const [form, set_form] = useState({
+  const initialState = {
     title: "",
     fname: "",
     lname: "",
@@ -24,23 +26,32 @@ export default function RegisterPage() {
     role: "patient",
     password: "",
     confirmPassword: "",
-  });
+  };
+
+  const [form, set_form] = useState(initialState);
   const [message, set_message] = useState<string | null>(null);
-  const [messageType, set_message_type] = useState<"error" | "success">(
-    "error",
-  );
+  const [messageType, set_message_type] = useState<"error" | "success">("error");
+
 
   const handle_change = (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLSelectElement>,
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = event.target;
-    set_form((current) => ({ ...current, [name]: value }));
+
+
+    if (name === "identification_number" || name === "phone_number") {
+      const onlyNums = value.replace(/\D/g, "");
+      set_form((current) => ({ ...current, [name]: onlyNums }));
+    } else {
+      set_form((current) => ({ ...current, [name]: value }));
+    }
+
+    if (message) set_message(null);
   };
 
   const handle_submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
 
     if (form.password !== form.confirmPassword) {
       set_message("รหัสผ่านไม่ตรงกัน");
@@ -48,30 +59,19 @@ export default function RegisterPage() {
       return;
     }
 
-    const required =
+    const is_valid =
       form.title &&
       form.fname &&
       form.lname &&
-      form.identification_number &&
-      form.phone_number &&
+      form.identification_number.length === 13 &&
+      form.phone_number.length === 10 &&
       form.birth_date &&
       form.email &&
+      form.sex &&
       form.password;
 
-    if (!required) {
-      set_message("กรุณากรอกข้อมูลให้ครบถ้วน");
-      set_message_type("error");
-      return;
-    }
-
-    if (form.identification_number.length !== 13) {
-      set_message("เลขบัตรประชาชนต้องมี 13 หลัก");
-      set_message_type("error");
-      return;
-    }
-
-    if (form.phone_number.length !== 10) {
-      set_message("เบอร์โทรศัพท์ต้องมี 10 หลัก");
+    if (!is_valid) {
+      set_message("กรุณากรอกข้อมูลให้ครบถ้วนและถูกต้อง (เลขบัตร 13 หลัก / เบอร์โทร 10 หลัก)");
       set_message_type("error");
       return;
     }
@@ -86,27 +86,16 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (response.ok) {
-        set_message("สมัครสมาชิกสำเร็จ!");
+        set_message("สมัครสมาชิกสำเร็จ! 🎉");
         set_message_type("success");
-        set_form({
-          title: "",
-          fname: "",
-          lname: "",
-          identification_number: "",
-          phone_number: "",
-          birth_date: "",
-          email: "",
-          sex: "",
-          password: "",
-          confirmPassword: "",
-          role: "patient",
-        });
+        set_form(initialState);
       } else {
-        set_message(data.error || "เกิดข้อผิดพลาด");
+        set_message(data.error || "เกิดข้อผิดพลาดในการสมัครสมาชิก");
         set_message_type("error");
       }
-    } catch {
-      set_message("ไม่สามารถเชื่อมต่อได้");
+    } catch (error) {
+      console.error("Register error:", error);
+      set_message("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้");
       set_message_type("error");
     }
   };
@@ -119,6 +108,8 @@ export default function RegisterPage() {
         <div className={styles.leftcard}>
           <h1 className={styles.title}>สมัครสมาชิก</h1>
           <form className={styles.formGrid} onSubmit={handle_submit}>
+
+
             <div className={styles.field}>
               <label className={styles.label}>
                 คำนำหน้า<span className={styles.required}>*</span>
@@ -140,6 +131,7 @@ export default function RegisterPage() {
                 ))}
               </div>
             </div>
+
 
             <div className={styles.field}>
               <label className={styles.label}>
@@ -163,11 +155,10 @@ export default function RegisterPage() {
               </div>
             </div>
 
+
             <div className={styles.fieldRow}>
               <div className={styles.field}>
-                <label htmlFor="fname" className={styles.label}>
-                  ชื่อ<span className={styles.required}>*</span>
-                </label>
+                <label htmlFor="fname" className={styles.label}>ชื่อ*</label>
                 <input
                   id="fname"
                   name="fname"
@@ -180,9 +171,7 @@ export default function RegisterPage() {
                 />
               </div>
               <div className={styles.field}>
-                <label htmlFor="lname" className={styles.label}>
-                  นามสกุล<span className={styles.required}>*</span>
-                </label>
+                <label htmlFor="lname" className={styles.label}>นามสกุล*</label>
                 <input
                   id="lname"
                   name="lname"
@@ -196,51 +185,41 @@ export default function RegisterPage() {
               </div>
             </div>
 
+
             <div className={styles.fieldRow}>
               <div className={styles.field}>
-                <label htmlFor="identification_number" className={styles.label}>
-                  เลขบัตรประชาชน<span className={styles.required}>*</span>
-                </label>
+                <label htmlFor="identification_number" className={styles.label}>เลขบัตรประชาชน*</label>
                 <input
                   id="identification_number"
                   name="identification_number"
                   type="text"
-                  inputMode="numeric"
-                  minLength={13}
                   maxLength={13}
-                  pattern="[0-9]{13}"
                   value={form.identification_number}
                   onChange={handle_change}
                   className={styles.input}
-                  placeholder="เลขบัตรประชาชน 13 หลัก"
+                  placeholder="13 หลัก"
                   required
                 />
               </div>
               <div className={styles.field}>
-                <label htmlFor="phone_number" className={styles.label}>
-                  เบอร์โทรศัพท์<span className={styles.required}>*</span>
-                </label>
+                <label htmlFor="phone_number" className={styles.label}>เบอร์โทรศัพท์*</label>
                 <input
                   id="phone_number"
                   name="phone_number"
-                  type="tel"
-                  inputMode="tel"
-                  minLength={10}
+                  type="text"
                   maxLength={10}
-                  pattern="[0-9]{10}"
                   value={form.phone_number}
                   onChange={handle_change}
                   className={styles.input}
-                  placeholder="เบอร์โทรศัพท์"
+                  placeholder="10 หลัก"
                   required
                 />
               </div>
             </div>
 
+            {/* วันเกิด และ อีเมล */}
             <div className={styles.field}>
-              <label htmlFor="birth_date" className={styles.label}>
-                วัน/เดือน/ ปีเกิด<span className={styles.required}>*</span>
-              </label>
+              <label htmlFor="birth_date" className={styles.label}>วัน/เดือน/ปีเกิด*</label>
               <input
                 id="birth_date"
                 name="birth_date"
@@ -253,9 +232,7 @@ export default function RegisterPage() {
             </div>
 
             <div className={styles.field}>
-              <label htmlFor="email" className={styles.label}>
-                อีเมล<span className={styles.required}>*</span>
-              </label>
+              <label htmlFor="email" className={styles.label}>อีเมล*</label>
               <input
                 id="email"
                 name="email"
@@ -263,15 +240,14 @@ export default function RegisterPage() {
                 value={form.email}
                 onChange={handle_change}
                 className={styles.input}
-                placeholder="อีเมล"
+                placeholder="example@mail.com"
                 required
               />
             </div>
 
+
             <div className={styles.field}>
-              <label htmlFor="password" className={styles.label}>
-                รหัสผ่าน<span className={styles.required}>*</span>
-              </label>
+              <label htmlFor="password" className={styles.label}>รหัสผ่าน*</label>
               <input
                 id="password"
                 name="password"
@@ -285,9 +261,7 @@ export default function RegisterPage() {
             </div>
 
             <div className={styles.field}>
-              <label htmlFor="confirmPassword" className={styles.label}>
-                ยืนยันรหัสผ่าน<span className={styles.required}>*</span>
-              </label>
+              <label htmlFor="confirmPassword" className={styles.label}>ยืนยันรหัสผ่าน*</label>
               <input
                 id="confirmPassword"
                 name="confirmPassword"
@@ -300,10 +274,9 @@ export default function RegisterPage() {
               />
             </div>
 
+
             {message && (
-              <div
-                className={`${styles.message} ${messageType === "error" ? styles.messageError : styles.messageSuccess}`}
-              >
+              <div className={`${styles.message} ${messageType === "error" ? styles.messageError : styles.messageSuccess}`}>
                 {message}
               </div>
             )}
@@ -313,19 +286,17 @@ export default function RegisterPage() {
             </button>
 
             <div className={styles.footer}>
-              หรือ{" "}
-              <Link href="/login" className={styles.link}>
-                เข้าสู่ระบบ
-              </Link>
+              มีบัญชีอยู่แล้ว? <Link href="/login" className={styles.link}>เข้าสู่ระบบ</Link>
             </div>
           </form>
         </div>
+
         <div className={styles.rightcard}>
           <img
             src="https://img5.pic.in.th/file/secure-sv1/healthcare-1.png"
-            alt="healthcare (1)"
+            alt="healthcare hero"
             className={styles.picture}
-          ></img>
+          />
           <h1 className={styles.heroText}>สุขภาพนัดได้</h1>
         </div>
       </div>
