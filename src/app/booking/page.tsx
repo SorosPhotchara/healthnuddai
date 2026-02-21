@@ -1,19 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/auth";
 import styles from "./booking.module.css";
 
-// ข้อมูล Mock สำหรับแผนก
-const DEPARTMENTS = [
-  { id: 1, name: "อายุรกรรม", icon: "💚", color: "#4ade80" },
-  { id: 2, name: "ศัลยกรรม", icon: "🔬", color: "#60a5fa" },
-  { id: 3, name: "กุมารเวช", icon: "👶", color: "#f472b6" },
-  { id: 4, name: "ศัลยกรรมตกแต่ง", icon: "🎨", color: "#fb923c" },
-  { id: 5, name: "กระดูก", icon: "🦴", color: "#a78bfa" },
-  { id: 6, name: "ตรวจสุขภาพ", icon: "📋", color: "#22d3ee" },
-];
+const DEPT_ICONS: { [key: number]: string } = {
+  1: "💚",
+  2: "🔬",
+  3: "👶",
+  4: "🎨",
+  5: "🦴",
+  6: "📋",
+};
 
 // เวลานัด
 const TIME_SLOTS = [
@@ -30,6 +29,9 @@ export default function BookingPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+
+
+  const [dbDepartments, setDbDepartments] = useState<any[]>([]);
 
   // Form data for step 3
   const [formData, setFormData] = useState({
@@ -49,6 +51,19 @@ export default function BookingPage() {
     hasUnderlyingDisease: false,
     underlyingDiseaseDetail: "",
   });
+
+
+  const fetchDepartments = useCallback(async () => {
+    try {
+      const res = await fetch("/api/departments");
+      const data = await res.json();
+      if (data.success) {
+        setDbDepartments(data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching departments:", error);
+    }
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -70,7 +85,8 @@ export default function BookingPage() {
 
   useEffect(() => {
     load_user();
-  }, [load_user]);
+    fetchDepartments();
+  }, [load_user, fetchDepartments]);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -105,7 +121,6 @@ export default function BookingPage() {
       }
     };
 
-    // เรียกใช้ฟังก์ชันทุกครั้งที่ formData.idNumber เปลี่ยนแปลง
     fetchUserData();
   }, [formData.idNumber]);
 
@@ -193,7 +208,6 @@ export default function BookingPage() {
   };
 
   const handleSubmit = async () => {
-    // 1. เตรียม Payload
     const payload = {
       identificationNumber: formData.idNumber,
       time: selectedTime,
@@ -245,7 +259,7 @@ export default function BookingPage() {
   };
 
   const getDeptName = () => {
-    return DEPARTMENTS.find(d => d.id === selectedDept)?.name || "";
+    return dbDepartments.find(d => d.dno === selectedDept)?.name || "";
   };
 
   return (
@@ -281,23 +295,25 @@ export default function BookingPage() {
 
       <div className={styles.contentCard}>
 
-        {/* Step 1: เลือกแผนก */}
+        {/* Step 1: เลือกแผนก  */}
         {currentStep === 1 && (
           <div className={styles.stepContent}>
             <h2 className={styles.stepTitle}>เลือกแผนกที่ต้องการ</h2>
-            <p className={styles.stepDescription}>กรุณาเลือกแผนกที่คุณต้องการรับบริการทุกแพทย์</p>
+            <p className={styles.stepDescription}>กรุณาเลือกแผนกที่คุณต้องการรับบริการ</p>
             <div className={styles.departmentGrid}>
-              {DEPARTMENTS.map((dept) => (
+              {dbDepartments.map((dept) => (
                 <div
-                  key={dept.id}
-                  className={`${styles.deptCard} ${selectedDept === dept.id ? styles.deptCardActive : ""}`}
-                  onClick={() => handleDeptSelect(dept.id)}
+                  key={dept.dno}
+                  className={`${styles.deptCard} ${selectedDept === dept.dno ? styles.deptCardActive : ""}`}
+                  onClick={() => handleDeptSelect(dept.dno)}
                 >
-                  <div className={styles.deptIcon}>{dept.icon}</div>
+                  {/* 🐧 ใช้ไอคอนตาม dno [cite: 2026-02-18] */}
+                  <div className={styles.deptIcon}>{DEPT_ICONS[Number(dept.dno)] || "🏥"}</div>
                   <div className={styles.deptName}>{dept.name}</div>
                 </div>
               ))}
             </div>
+            {dbDepartments.length === 0 && <p className={styles.loading}>กำลังโหลดรายชื่อแผนก...</p>}
           </div>
         )}
 
@@ -514,7 +530,10 @@ export default function BookingPage() {
               <div className={styles.summarySection}>
                 <div className={styles.summaryRow}>
                   <span className={styles.summaryLabel}>แผนก</span>
-                  <span className={styles.summaryValue}>{getDeptName()}</span>
+
+                  <span className={styles.summaryValue}>
+                    {DEPT_ICONS[Number(selectedDept)]} {getDeptName()}
+                  </span>
                 </div>
                 <div className={styles.summaryRow}>
                   <span className={styles.summaryLabel}>วันที่นัดหมาย</span>

@@ -207,7 +207,7 @@ export default function ProfilePage() {
             );
           })
         ) : (
-          <div className={styles.noData}>📭 ไม่มีรายการนัดหมายที่รอยืนยัน</div>
+          <div className={styles.noData}>ไม่มีรายการนัดหมายที่รอยืนยัน</div>
         )}
       </div>
 
@@ -215,7 +215,6 @@ export default function ProfilePage() {
         <h2 className={styles.sectionTitle}>ประวัติการนัดหมาย</h2>
         <div className={styles.historyList}>
           {history.length > 0 ? history.map((item) => {
-            // 🐧 ตัดเงื่อนไข expired status ออก ให้แสดงเป็น "ยกเลิกแล้ว" แทน [cite: 2026-02-18]
             return (
               <div key={item.ap_id} className={styles.historyCard}>
                 <div className={styles.historyDate}>{item.date?.split('T')[0]}</div>
