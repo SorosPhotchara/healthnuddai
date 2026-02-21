@@ -219,7 +219,7 @@ export default function BookingPage() {
     try {
       console.log("Sending Payload:", payload);
 
-      const response = await fetch("/api/bookings", {
+      const response = await fetch("/api/booking", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -422,10 +422,10 @@ export default function BookingPage() {
                 <label className={styles.label}>เพศ *</label>
                 <div className={styles.radioGroup}>
                   <label className={styles.radioLabel}>
-                    <input type="radio" name="sex" value="ชาย" checked={formData.sex === "ชาย"} onChange={handleInputChange} /> ชาย
+                    <input type="radio" name="sex" value="M" checked={formData.sex === "M"} onChange={handleInputChange} /> ชาย
                   </label>
                   <label className={styles.radioLabel}>
-                    <input type="radio" name="sex" value="หญิง" checked={formData.sex === "หญิง"} onChange={handleInputChange} /> หญิง
+                    <input type="radio" name="sex" value="F" checked={formData.sex === "F"} onChange={handleInputChange} /> หญิง
                   </label>
                 </div>
               </div>

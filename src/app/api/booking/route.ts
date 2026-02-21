@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+
+
     const {
       identificationNumber,
       time,
@@ -24,30 +26,27 @@ export async function POST(request: NextRequest) {
       status
     } = body;
 
-    if (!title || !identificationNumber || !fname || !lname || !phoneNumber || !sex || !date || !time) {
-      return NextResponse.json(
-        { error: "กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน" },
-        { status: 400 }
-      );
+    if (!title || !identificationNumber || !fname || !lname || !date || !time) {
+      return NextResponse.json({ error: "กรุณากรอกข้อมูลให้ครบถ้วน" }, { status: 400 });
     }
 
+
     const existingAppointment = await db.execute({
-      sql: `SELECT indentificationNumber FROM appointments WHERE indentificationNumber = ? AND date = ? AND time = ?`,
+      sql: `SELECT identification_number FROM appointments 
+            WHERE identification_number = ? AND date = ? AND time = ?`,
       args: [identificationNumber, date, time],
     });
 
     if (existingAppointment.rows.length > 0) {
-      return NextResponse.json(
-        { error: "คุณมีคิวจองในวันและเวลานี้แล้ว" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "คุณมีคิวจองในวันและเวลานี้แล้ว" }, { status: 400 });
     }
+
 
     await db.execute({
       sql: `INSERT INTO appointments (
-              indentificationNumber, time, date, title, fname, lname, phoneNumber, sex, 
-              isSmoking, isDrinking, hasFoodAllergy, foodAlergyDetail, 
-              hasDrugAllergy, drugAllergyDetail, hasUderlyingDisease, underlyingDiseaseDetail, status
+              identification_number, time, date, title, fname, lname, phone_number, sex, 
+              is_smoking, is_drinking, has_food_allergy, food_allergy_detail, 
+              has_drug_allergy, drug_allergy_detail, has_underlying_disease, underlying_disease_detail, status
             ) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
