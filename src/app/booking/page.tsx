@@ -30,21 +30,43 @@ export default function BookingPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  
+
   // Form data for step 3
   const [formData, setFormData] = useState({
-    firstName: "",
     idNumber: "",
+    title: "",
+    firstName: "",
+    lastName: "",
     phone: "",
+    sex: "",
     birthDate: "",
-    prefix: "",
-    hasSymptoms: "",
-    symptoms: "",
-    hasAllergies: "",
-    allergies: "",
-    hasCongenital: "",
-    congenital: ""
+    isSmoking: false,
+    isDrinking: false,
+    hasFoodAllergy: false,
+    foodAllergyDetail: "",
+    hasDrugAllergy: false,
+    drugAllergyDetail: "",
+    hasUnderlyingDisease: false,
+    underlyingDiseaseDetail: "",
   });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+
+    if (type === "checkbox") {
+      const target = e.target as HTMLInputElement;
+      setFormData(prev => ({ ...prev, [name]: target.checked }));
+    } else if (value === "true" || value === "false") {
+      setFormData(prev => ({ ...prev, [name]: value === "true" }));
+    } else {
+      if (name === "idNumber" || name === "phone") {
+        const onlyNums = value.replace(/\D/g, "");
+        setFormData(prev => ({ ...prev, [name]: onlyNums }));
+      } else {
+        setFormData(prev => ({ ...prev, [name]: value }));
+      }
+    }
+  };
 
   useEffect(() => {
     load_user();
@@ -60,17 +82,12 @@ export default function BookingPage() {
     const startingDayOfWeek = firstDay.getDay();
 
     const days = [];
-    
-    // วันว่างก่อนวันที่ 1
     for (let i = 0; i < startingDayOfWeek; i++) {
       days.push(null);
     }
-    
-    // วันที่จริง
     for (let day = 1; day <= daysInMonth; day++) {
       days.push(new Date(year, month, day));
     }
-    
     return days;
   };
 
@@ -85,8 +102,8 @@ export default function BookingPage() {
   const isSameDay = (date1: Date | null, date2: Date | null) => {
     if (!date1 || !date2) return false;
     return date1.getDate() === date2.getDate() &&
-           date1.getMonth() === date2.getMonth() &&
-           date1.getFullYear() === date2.getFullYear();
+      date1.getMonth() === date2.getMonth() &&
+      date1.getFullYear() === date2.getFullYear();
   };
 
   const isDateSelectable = (date: Date) => {
@@ -95,7 +112,6 @@ export default function BookingPage() {
     return date >= today;
   };
 
-  // Handlers
   const handleDeptSelect = (deptId: number) => {
     setSelectedDept(deptId);
   };
@@ -127,8 +143,8 @@ export default function BookingPage() {
   };
 
   const isFormValid = () => {
-    return formData.firstName && formData.idNumber && formData.phone && 
-           formData.birthDate && formData.prefix;
+    return formData.firstName && formData.lastName && formData.idNumber && formData.phone &&
+      formData.birthDate && formData.title && formData.sex;
   };
 
   const handlePrevMonth = () => {
@@ -140,15 +156,30 @@ export default function BookingPage() {
   };
 
   const handleSubmit = async () => {
-    // จำลองการส่งข้อมูล
-    console.log({
-      department: selectedDept,
-      date: selectedDate,
+    const payload = {
+      identificationNumber: formData.idNumber,
       time: selectedTime,
-      formData: formData
-    });
-    
-    // Redirect to profile or success page
+      date: selectedDate ? selectedDate.toISOString() : null,
+      title: formData.title,
+      fname: formData.firstName,
+      lname: formData.lastName,
+      phoneNumber: formData.phone,
+      sex: formData.sex,
+      birthDate: formData.birthDate,
+      isSmoking: formData.isSmoking,
+      isDrinking: formData.isDrinking,
+      hasFoodAllergy: formData.hasFoodAllergy,
+      foodAllergyDetail: formData.hasFoodAllergy ? formData.foodAllergyDetail : "",
+      hasDrugAllergy: formData.hasDrugAllergy,
+      drugAllergyDetail: formData.hasDrugAllergy ? formData.drugAllergyDetail : "",
+      hasUnderlyingDisease: formData.hasUnderlyingDisease,
+      underlyingDiseaseDetail: formData.hasUnderlyingDisease ? formData.underlyingDiseaseDetail : "",
+      status: "pending",
+      departmentId: selectedDept
+    };
+
+    console.log("Submitting Payload to DB:", payload);
+    // TODO: Send data to API here
     router.push("/profile");
   };
 
@@ -169,23 +200,17 @@ export default function BookingPage() {
             <div className={styles.stepCircle}>1</div>
             <span className={styles.stepLabel}>เลือกแผนก</span>
           </div>
-          
           <div className={styles.stepLine}></div>
-          
           <div className={`${styles.step} ${currentStep >= 2 ? styles.stepActive : ""}`}>
             <div className={styles.stepCircle}>2</div>
             <span className={styles.stepLabel}>เลือกวันเวลา</span>
           </div>
-          
           <div className={styles.stepLine}></div>
-          
           <div className={`${styles.step} ${currentStep >= 3 ? styles.stepActive : ""}`}>
             <div className={styles.stepCircle}>3</div>
             <span className={styles.stepLabel}>กรอกข้อมูล</span>
           </div>
-          
           <div className={styles.stepLine}></div>
-          
           <div className={`${styles.step} ${currentStep >= 4 ? styles.stepActive : ""}`}>
             <div className={styles.stepCircle}>4</div>
             <span className={styles.stepLabel}>ยืนยัน</span>
@@ -193,15 +218,13 @@ export default function BookingPage() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className={styles.contentCard}>
-        
+
         {/* Step 1: เลือกแผนก */}
         {currentStep === 1 && (
           <div className={styles.stepContent}>
             <h2 className={styles.stepTitle}>เลือกแผนกที่ต้องการ</h2>
             <p className={styles.stepDescription}>กรุณาเลือกแผนกที่คุณต้องการรับบริการทุกแพทย์</p>
-            
             <div className={styles.departmentGrid}>
               {DEPARTMENTS.map((dept) => (
                 <div
@@ -209,9 +232,7 @@ export default function BookingPage() {
                   className={`${styles.deptCard} ${selectedDept === dept.id ? styles.deptCardActive : ""}`}
                   onClick={() => handleDeptSelect(dept.id)}
                 >
-                  <div className={styles.deptIcon}>
-                    {dept.icon}
-                  </div>
+                  <div className={styles.deptIcon}>{dept.icon}</div>
                   <div className={styles.deptName}>{dept.name}</div>
                 </div>
               ))}
@@ -224,26 +245,22 @@ export default function BookingPage() {
           <div className={styles.stepContent}>
             <h2 className={styles.stepTitle}>เลือกวันและเวลา</h2>
             <p className={styles.stepDescription}>กรุณาเลือกวันที่และเวลาที่สะดวก</p>
-            
-            {/* Calendar */}
+
             <div className={styles.calendarSection}>
               <div className={styles.calendarHeader}>
                 <button className={styles.monthBtn} onClick={handlePrevMonth}>-</button>
                 <h3 className={styles.monthYear}>{formatThaiMonth(currentMonth)}</h3>
                 <button className={styles.monthBtn} onClick={handleNextMonth}>+</button>
               </div>
-              
+
               <div className={styles.calendar}>
                 <div className={styles.weekdays}>
-                  <div className={styles.weekday}>อา</div>
-                  <div className={styles.weekday}>จ</div>
-                  <div className={styles.weekday}>อ</div>
-                  <div className={styles.weekday}>พ</div>
-                  <div className={styles.weekday}>พฤ</div>
-                  <div className={styles.weekday}>ศ</div>
+                  <div className={styles.weekday}>อา</div><div className={styles.weekday}>จ</div>
+                  <div className={styles.weekday}>อ</div><div className={styles.weekday}>พ</div>
+                  <div className={styles.weekday}>พฤ</div><div className={styles.weekday}>ศ</div>
                   <div className={styles.weekday}>ส</div>
                 </div>
-                
+
                 <div className={styles.days}>
                   {getDaysInMonth(currentMonth).map((day, index) => (
                     <div
@@ -260,7 +277,6 @@ export default function BookingPage() {
               </div>
             </div>
 
-            {/* Time Slots */}
             <div className={styles.timeSection}>
               <h3 className={styles.sectionTitle}>เลือกเวลา</h3>
               <div className={styles.timeGrid}>
@@ -283,60 +299,44 @@ export default function BookingPage() {
           <div className={styles.stepContent}>
             <h2 className={styles.stepTitle}>กรอกข้อมูลผู้ป่วย</h2>
             <p className={styles.stepDescription}>กรุณากรอกข้อมูลให้ครบถ้วน</p>
-            
+
             <div className={styles.form}>
               <div className={styles.formGroup}>
                 <label className={styles.label}>คำนำหน้า *</label>
                 <div className={styles.radioGroup}>
                   <label className={styles.radioLabel}>
-                    <input 
-                      type="radio" 
-                      name="prefix" 
-                      value="นาย"
-                      checked={formData.prefix === "นาย"}
-                      onChange={(e) => setFormData({...formData, prefix: e.target.value})}
-                    /> นาย
+                    <input type="radio" name="title" value="นาย" checked={formData.title === "นาย"} onChange={handleInputChange} /> นาย
                   </label>
                   <label className={styles.radioLabel}>
-                    <input 
-                      type="radio" 
-                      name="prefix" 
-                      value="นาง"
-                      checked={formData.prefix === "นาง"}
-                      onChange={(e) => setFormData({...formData, prefix: e.target.value})}
-                    /> นาง
+                    <input type="radio" name="title" value="นาง" checked={formData.title === "นาง"} onChange={handleInputChange} /> นาง
                   </label>
                   <label className={styles.radioLabel}>
-                    <input 
-                      type="radio" 
-                      name="prefix" 
-                      value="นางสาว"
-                      checked={formData.prefix === "นางสาว"}
-                      onChange={(e) => setFormData({...formData, prefix: e.target.value})}
-                    /> นางสาว
+                    <input type="radio" name="title" value="นางสาว" checked={formData.title === "นางสาว"} onChange={handleInputChange} /> นางสาว
                   </label>
                 </div>
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.label}>ชื่อ-นามสกุล *</label>
-                <input
-                  type="text"
-                  className={styles.input}
-                  placeholder="ชื่อ-นามสกุล"
-                  value={formData.firstName}
-                  onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                />
+                <label className={styles.label}>ชื่อ *</label>
+                <input type="text" name="firstName" className={styles.input} placeholder="ชื่อ" value={formData.firstName} onChange={handleInputChange} />
               </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>นามสกุล *</label>
+                <input type="text" name="lastName" className={styles.input} placeholder="นามสกุล" value={formData.lastName} onChange={handleInputChange} />
+              </div>
+
 
               <div className={styles.formGroup}>
                 <label className={styles.label}>เลขบัตรประชาชน *</label>
                 <input
                   type="text"
+                  name="idNumber"
                   className={styles.input}
-                  placeholder="0-0000-00000-00-0"
+                  placeholder="0000000000000"
                   value={formData.idNumber}
-                  onChange={(e) => setFormData({...formData, idNumber: e.target.value})}
+                  onChange={handleInputChange}
+                  maxLength={13}
                 />
               </div>
 
@@ -344,68 +344,29 @@ export default function BookingPage() {
                 <label className={styles.label}>เบอร์โทรศัพท์ *</label>
                 <input
                   type="tel"
+                  name="phone"
                   className={styles.input}
-                  placeholder="000-000-0000"
+                  placeholder="0000000000"
                   value={formData.phone}
-                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                  onChange={handleInputChange}
+                  maxLength={10}
                 />
               </div>
 
               <div className={styles.formGroup}>
                 <label className={styles.label}>วัน/เดือน/ปีเกิด *</label>
-                <input
-                  type="text"
-                  className={styles.input}
-                  placeholder="วว/ดด/ปปปป"
-                  value={formData.birthDate}
-                  onChange={(e) => setFormData({...formData, birthDate: e.target.value})}
-                />
+                <input type="date" name="birthDate" className={styles.input} value={formData.birthDate} onChange={handleInputChange} />
               </div>
 
               <div className={styles.formGroup}>
                 <label className={styles.label}>เพศ *</label>
                 <div className={styles.radioGroup}>
                   <label className={styles.radioLabel}>
-                    <input 
-                      type="radio" 
-                      name="sex" 
-                      value="ชาย"
-                      checked={formData.hasSymptoms === "ชาย"}
-                      onChange={(e) => setFormData({...formData, hasSymptoms: e.target.value})}
-                    /> ชาย
+                    <input type="radio" name="sex" value="ชาย" checked={formData.sex === "ชาย"} onChange={handleInputChange} /> ชาย
                   </label>
                   <label className={styles.radioLabel}>
-                    <input 
-                      type="radio" 
-                      name="sex" 
-                      value="หญิง"
-                      checked={formData.hasSymptoms === "หญิง"}
-                      onChange={(e) => setFormData({...formData, hasSymptoms: e.target.value})}
-                    /> หญิง
+                    <input type="radio" name="sex" value="หญิง" checked={formData.sex === "หญิง"} onChange={handleInputChange} /> หญิง
                   </label>
-                </div>
-              </div>
-
-              <div className={styles.formRow}>
-                <div className={styles.formGroupHalf}>
-                  <label className={styles.label}>น้ำหนัก (กก.) *</label>
-                  <input
-                    type="text"
-                    className={styles.input}
-                    placeholder="น้ำหนัก"
-                    value={formData.symptoms}
-                    onChange={(e) => setFormData({...formData, symptoms: e.target.value})}
-                  />
-                </div>
-                <div className={styles.formGroupHalf}>
-                  <label className={styles.label}>ส่วนสูง (ซม.) *</label>
-                  <input
-                    type="text"
-                    className={styles.input}
-                    placeholder="ส่วนสูง"
-                    value={formData.allergies}
-                    onChange={(e) => setFormData({...formData, allergies: e.target.value})}
-                  />
                 </div>
               </div>
 
@@ -414,10 +375,10 @@ export default function BookingPage() {
                   <label className={styles.label}>สูบบุหรี่ไหม? *</label>
                   <div className={styles.radioGroup}>
                     <label className={styles.radioLabel}>
-                      <input type="radio" name="smoke" value="สูบ" /> สูบ
+                      <input type="radio" name="isSmoking" value="true" checked={formData.isSmoking === true} onChange={handleInputChange} /> สูบ
                     </label>
                     <label className={styles.radioLabel}>
-                      <input type="radio" name="smoke" value="ไม่สูบ" /> ไม่สูบ
+                      <input type="radio" name="isSmoking" value="false" checked={formData.isSmoking === false} onChange={handleInputChange} /> ไม่สูบ
                     </label>
                   </div>
                 </div>
@@ -425,10 +386,10 @@ export default function BookingPage() {
                   <label className={styles.label}>ดื่มเหล้าไหม? *</label>
                   <div className={styles.radioGroup}>
                     <label className={styles.radioLabel}>
-                      <input type="radio" name="drink" value="ดื่ม" /> ดื่ม
+                      <input type="radio" name="isDrinking" value="true" checked={formData.isDrinking === true} onChange={handleInputChange} /> ดื่ม
                     </label>
                     <label className={styles.radioLabel}>
-                      <input type="radio" name="drink" value="ไม่ดื่ม" /> ไม่ดื่ม
+                      <input type="radio" name="isDrinking" value="false" checked={formData.isDrinking === false} onChange={handleInputChange} /> ไม่ดื่ม
                     </label>
                   </div>
                 </div>
@@ -438,32 +399,14 @@ export default function BookingPage() {
                 <label className={styles.label}>แพ้อาหารไหม? *</label>
                 <div className={styles.radioGroup}>
                   <label className={styles.radioLabel}>
-                    <input 
-                      type="radio" 
-                      name="foodAllergy" 
-                      value="ไม่แพ้"
-                      checked={formData.hasAllergies === "ไม่แพ้"}
-                      onChange={(e) => setFormData({...formData, hasAllergies: e.target.value, allergies: ""})}
-                    /> ไม่แพ้
+                    <input type="radio" name="hasFoodAllergy" value="false" checked={formData.hasFoodAllergy === false} onChange={handleInputChange} /> ไม่แพ้
                   </label>
                   <label className={styles.radioLabel}>
-                    <input 
-                      type="radio" 
-                      name="foodAllergy" 
-                      value="แพ้"
-                      checked={formData.hasAllergies === "แพ้"}
-                      onChange={(e) => setFormData({...formData, hasAllergies: e.target.value})}
-                    /> แพ้
+                    <input type="radio" name="hasFoodAllergy" value="true" checked={formData.hasFoodAllergy === true} onChange={handleInputChange} /> แพ้
                   </label>
                 </div>
-                {formData.hasAllergies === "แพ้" && (
-                  <textarea
-                    className={styles.textarea}
-                    placeholder="โปรดระบุอาหารที่แพ้"
-                    value={formData.allergies}
-                    onChange={(e) => setFormData({...formData, allergies: e.target.value})}
-                    rows={3}
-                  />
+                {formData.hasFoodAllergy && (
+                  <textarea name="foodAllergyDetail" className={styles.textarea} placeholder="โปรดระบุอาหารที่แพ้" value={formData.foodAllergyDetail} onChange={handleInputChange} rows={3} />
                 )}
               </div>
 
@@ -471,32 +414,14 @@ export default function BookingPage() {
                 <label className={styles.label}>แพ้ยาไหม? *</label>
                 <div className={styles.radioGroup}>
                   <label className={styles.radioLabel}>
-                    <input 
-                      type="radio" 
-                      name="drugAllergy" 
-                      value="ไม่แพ้"
-                      checked={formData.hasCongenital === "ไม่แพ้"}
-                      onChange={(e) => setFormData({...formData, hasCongenital: e.target.value, congenital: ""})}
-                    /> ไม่แพ้
+                    <input type="radio" name="hasDrugAllergy" value="false" checked={formData.hasDrugAllergy === false} onChange={handleInputChange} /> ไม่แพ้
                   </label>
                   <label className={styles.radioLabel}>
-                    <input 
-                      type="radio" 
-                      name="drugAllergy" 
-                      value="แพ้"
-                      checked={formData.hasCongenital === "แพ้"}
-                      onChange={(e) => setFormData({...formData, hasCongenital: e.target.value})}
-                    /> แพ้
+                    <input type="radio" name="hasDrugAllergy" value="true" checked={formData.hasDrugAllergy === true} onChange={handleInputChange} /> แพ้
                   </label>
                 </div>
-                {formData.hasCongenital === "แพ้" && (
-                  <textarea
-                    className={styles.textarea}
-                    placeholder="โปรดระบุยาที่แพ้"
-                    value={formData.congenital}
-                    onChange={(e) => setFormData({...formData, congenital: e.target.value})}
-                    rows={3}
-                  />
+                {formData.hasDrugAllergy && (
+                  <textarea name="drugAllergyDetail" className={styles.textarea} placeholder="โปรดระบุยาที่แพ้" value={formData.drugAllergyDetail} onChange={handleInputChange} rows={3} />
                 )}
               </div>
 
@@ -504,27 +429,15 @@ export default function BookingPage() {
                 <label className={styles.label}>มีโรคประจำตัวไหม? *</label>
                 <div className={styles.radioGroup}>
                   <label className={styles.radioLabel}>
-                    <input 
-                      type="radio" 
-                      name="disease" 
-                      value="ไม่มี"
-                      onChange={(e) => setFormData({...formData})}
-                    /> ไม่มี
+                    <input type="radio" name="hasUnderlyingDisease" value="false" checked={formData.hasUnderlyingDisease === false} onChange={handleInputChange} /> ไม่มี
                   </label>
                   <label className={styles.radioLabel}>
-                    <input 
-                      type="radio" 
-                      name="disease" 
-                      value="มี"
-                      onChange={(e) => setFormData({...formData})}
-                    /> มี
+                    <input type="radio" name="hasUnderlyingDisease" value="true" checked={formData.hasUnderlyingDisease === true} onChange={handleInputChange} /> มี
                   </label>
                 </div>
-                <textarea
-                  className={styles.textarea}
-                  placeholder="โปรดระบุโรคประจำตัว (ถ้ามี)"
-                  rows={3}
-                />
+                {formData.hasUnderlyingDisease && (
+                  <textarea name="underlyingDiseaseDetail" className={styles.textarea} placeholder="ระบุโรคประจำตัว" value={formData.underlyingDiseaseDetail} onChange={handleInputChange} rows={3} />
+                )}
               </div>
             </div>
           </div>
@@ -535,19 +448,18 @@ export default function BookingPage() {
           <div className={styles.stepContent}>
             <h2 className={styles.stepTitle}>ยืนยันการจองนัด</h2>
             <p className={styles.stepDescription}>กรุณาตรวจสอบข้อมูลก่อนยืนยันการจอง</p>
-            
+
             <div className={styles.summaryCard}>
               <h3 className={styles.summaryTitle}>สรุปการจองนัด</h3>
-              
               <div className={styles.summarySection}>
                 <div className={styles.summaryRow}>
                   <span className={styles.summaryLabel}>แผนก</span>
                   <span className={styles.summaryValue}>{getDeptName()}</span>
                 </div>
                 <div className={styles.summaryRow}>
-                  <span className={styles.summaryLabel}>วันที่</span>
+                  <span className={styles.summaryLabel}>วันที่นัดหมาย</span>
                   <span className={styles.summaryValue}>
-                    {selectedDate && `25 มกราคม 2568`}
+                    {selectedDate && selectedDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}
                   </span>
                 </div>
                 <div className={styles.summaryRow}>
@@ -555,12 +467,16 @@ export default function BookingPage() {
                   <span className={styles.summaryValue}>{selectedTime} น.</span>
                 </div>
                 <div className={styles.summaryRow}>
-                  <span className={styles.summaryLabel}>ชื่อ</span>
-                  <span className={styles.summaryValue}>นายหวัง รักจัง</span>
+                  <span className={styles.summaryLabel}>ชื่อ-นามสกุล</span>
+                  <span className={styles.summaryValue}>{formData.title}{formData.firstName} {formData.lastName}</span>
                 </div>
                 <div className={styles.summaryRow}>
                   <span className={styles.summaryLabel}>เบอร์โทร</span>
-                  <span className={styles.summaryValue}>098-765-4321</span>
+                  <span className={styles.summaryValue}>{formData.phone}</span>
+                </div>
+                <div className={styles.summaryRow}>
+                  <span className={styles.summaryLabel}>วันเกิด</span>
+                  <span className={styles.summaryValue}>{formData.birthDate}</span>
                 </div>
               </div>
 
@@ -570,25 +486,15 @@ export default function BookingPage() {
                   <li>บัตรประชาชน</li>
                   <li>บัตรสิทธิการรักษา (บัตรทอง/ประกันสังคม)</li>
                   <li>ระเบียนทั้ง QR Code</li>
-                  <li>บัตรผู้ป่วย (ถ้ามีคุณมี)</li>
+                  <li>บัตรผู้ป่วย (ถ้ามี)</li>
                   <li>ผลตรวจสืบ (ถ้ามี)</li>
                 </ul>
               </div>
-
               <div className={styles.infoSection}>
                 <h4 className={styles.infoTitle}>การเตรียมตัว</h4>
                 <ul className={styles.infoList}>
                   <li>มาก่อนเวลานัดอย่างน้อย 15-30 นาที</li>
                   <li>งดอาหาร 8 ชั่วโมง (สำหรับตรวจเลือด)</li>
-                  <li>แจ้งคลินิกกดระงับนาทีเปี่ยม</li>
-                </ul>
-              </div>
-
-              <div className={styles.infoSection}>
-                <h4 className={styles.infoTitle}>นโยบายการยกเลิก/เลื่อนนัด</h4>
-                <ul className={styles.infoList}>
-                  <li>ยกเลิกหรือเลื่อนนัดมาได้ก่อน 24 ชั่วโมง</li>
-                  <li>บาทหลัง 1-5 นาที การนัดเก่านำกลับมา</li>
                 </ul>
               </div>
             </div>
@@ -602,10 +508,10 @@ export default function BookingPage() {
               ย้อนกลับ
             </button>
           )}
-          
+
           {currentStep < 4 ? (
-            <button 
-              className={styles.btnNext} 
+            <button
+              className={styles.btnNext}
               onClick={handleNextStep}
               disabled={
                 (currentStep === 1 && !selectedDept) ||
@@ -621,6 +527,7 @@ export default function BookingPage() {
             </button>
           )}
         </div>
+
       </div>
 
       {/* Footer */}
