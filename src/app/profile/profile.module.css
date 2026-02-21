@@ -4,6 +4,17 @@
   padding: 2rem;
 }
 
+.noData {
+  text-align: center;
+  padding: 40px 20px;
+  font-size: 1.1rem;
+  background-color: #f8fafc;
+  border-radius: 12px;
+  border: 1px dashed #cbd5e1;
+  margin: 10px 0;
+  color: #1e293b;
+}
+
 .loading {
   text-align: center;
   padding: 4rem;
@@ -139,6 +150,7 @@
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 0.25rem;
+  color: #1e293b;
 }
 
 .timeText {
@@ -166,6 +178,9 @@
 
 .detailLabel {
   opacity: 0.8;
+  font-weight: 500;
+  color: #64748b;
+  margin-right: 8px;
 }
 
 .appointmentActions {
@@ -290,7 +305,7 @@
   color: white;
   text-align: center;
   padding: 1.5rem;
-  margin:0 -2rem 0 -2rem;
+  margin: 0 -2rem 0 -2rem;
 }
 
 .footer p {
@@ -302,6 +317,7 @@
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
+    color: #1e293b;
   }
 
   .infoGrid {

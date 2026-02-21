@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       lname,
       phoneNumber,
       sex,
-      birthDate, // 🐧 เพิ่มมาแล้ว
+      birthDate,
       isSmoking,
       isDrinking,
       hasFoodAllergy,
@@ -24,10 +24,9 @@ export async function POST(request: NextRequest) {
       hasUnderlyingDisease,
       underlyingDiseaseDetail,
       status,
-      departmentId // 🐧 เพิ่มมาแล้ว
+      departmentId
     } = body;
 
-    // ตรวจสอบข้อมูลที่จำเป็น
     if (!title || !identificationNumber || !fname || !lname || !date || !time) {
       return NextResponse.json({ error: "กรุณากรอกข้อมูลให้ครบถ้วน" }, { status: 400 });
     }
@@ -42,7 +41,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "คุณมีคิวจองในวันและเวลานี้แล้ว" }, { status: 400 });
     }
 
-    // 🐧 เพิ่ม birth_date และ department_id ลงใน SQL และ Args
+
     await db.execute({
       sql: `INSERT INTO appointments (
               identification_number, time, date, title, fname, lname, phone_number, sex, birthDate,
