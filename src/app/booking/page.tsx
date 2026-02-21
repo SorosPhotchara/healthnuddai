@@ -72,6 +72,43 @@ export default function BookingPage() {
     load_user();
   }, [load_user]);
 
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/login");
+    }
+  }, [isLoading, user, router]);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (formData.idNumber.length === 13) {
+        try {
+          const response = await fetch(`/api/users/check?id=${formData.idNumber}`);
+
+          if (response.ok) {
+            const data = await response.json();
+
+            if (data.success && data.user) {
+              setFormData((prev) => ({
+                ...prev,
+                title: data.user.title || prev.title,
+                firstName: data.user.fname || prev.firstName,
+                lastName: data.user.lname || prev.lastName,
+                phone: data.user.phone_number || prev.phone,
+                sex: data.user.sex || prev.sex,
+                birthDate: data.user.birth_date || prev.birthDate,
+              }));
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      }
+    };
+
+    // เรียกใช้ฟังก์ชันทุกครั้งที่ formData.idNumber เปลี่ยนแปลง
+    fetchUserData();
+  }, [formData.idNumber]);
+
   // ฟังก์ชันสร้างปฏิทิน
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -156,6 +193,7 @@ export default function BookingPage() {
   };
 
   const handleSubmit = async () => {
+    // 1. เตรียม Payload
     const payload = {
       identificationNumber: formData.idNumber,
       time: selectedTime,
@@ -178,9 +216,32 @@ export default function BookingPage() {
       departmentId: selectedDept
     };
 
-    console.log("Submitting Payload to DB:", payload);
-    // TODO: Send data to API here
-    router.push("/profile");
+    try {
+      console.log("Sending Payload:", payload);
+
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(`เกิดข้อผิดพลาด: ${data.error || "ไม่สามารถจองคิวได้ กรุณาลองใหม่"}`);
+        return;
+      }
+
+      alert("จองคิวสำเร็จเรียบร้อยครับ!");
+      console.log("Success:", data);
+      router.push("/profile");
+
+    } catch (error) {
+      console.error("Fetch Error:", error);
+      alert("เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์");
+    }
   };
 
   const getDeptName = () => {
@@ -302,6 +363,19 @@ export default function BookingPage() {
 
             <div className={styles.form}>
               <div className={styles.formGroup}>
+                <label className={styles.label}>เลขบัตรประชาชน *</label>
+                <input
+                  type="text"
+                  name="idNumber"
+                  className={styles.input}
+                  placeholder="0000000000000"
+                  value={formData.idNumber}
+                  onChange={handleInputChange}
+                  maxLength={13}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
                 <label className={styles.label}>คำนำหน้า *</label>
                 <div className={styles.radioGroup}>
                   <label className={styles.radioLabel}>
@@ -324,20 +398,6 @@ export default function BookingPage() {
               <div className={styles.formGroup}>
                 <label className={styles.label}>นามสกุล *</label>
                 <input type="text" name="lastName" className={styles.input} placeholder="นามสกุล" value={formData.lastName} onChange={handleInputChange} />
-              </div>
-
-
-              <div className={styles.formGroup}>
-                <label className={styles.label}>เลขบัตรประชาชน *</label>
-                <input
-                  type="text"
-                  name="idNumber"
-                  className={styles.input}
-                  placeholder="0000000000000"
-                  value={formData.idNumber}
-                  onChange={handleInputChange}
-                  maxLength={13}
-                />
               </div>
 
               <div className={styles.formGroup}>

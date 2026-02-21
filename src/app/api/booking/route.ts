@@ -1,4 +1,83 @@
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const {
+      identificationNumber,
+      time,
+      date,
+      title,
+      fname,
+      lname,
+      phoneNumber,
+      sex,
+      isSmoking,
+      isDrinking,
+      hasFoodAllergy,
+      foodAllergyDetail,
+      hasDrugAllergy,
+      drugAllergyDetail,
+      hasUnderlyingDisease,
+      underlyingDiseaseDetail,
+      status
+    } = body;
 
+    if (!title || !identificationNumber || !fname || !lname || !phoneNumber || !sex || !date || !time) {
+      return NextResponse.json(
+        { error: "กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน" },
+        { status: 400 }
+      );
+    }
+
+    const existingAppointment = await db.execute({
+      sql: `SELECT indentificationNumber FROM appointments WHERE indentificationNumber = ? AND date = ? AND time = ?`,
+      args: [identificationNumber, date, time],
+    });
+
+    if (existingAppointment.rows.length > 0) {
+      return NextResponse.json(
+        { error: "คุณมีคิวจองในวันและเวลานี้แล้ว" },
+        { status: 400 }
+      );
+    }
+
+    await db.execute({
+      sql: `INSERT INTO appointments (
+              indentificationNumber, time, date, title, fname, lname, phoneNumber, sex, 
+              isSmoking, isDrinking, hasFoodAllergy, foodAlergyDetail, 
+              hasDrugAllergy, drugAllergyDetail, hasUderlyingDisease, underlyingDiseaseDetail, status
+            ) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: [
+        identificationNumber,
+        time,
+        date,
+        title,
+        fname,
+        lname,
+        phoneNumber,
+        sex,
+        isSmoking ? 1 : 0,
+        isDrinking ? 1 : 0,
+        hasFoodAllergy ? 1 : 0,
+        foodAllergyDetail || "",
+        hasDrugAllergy ? 1 : 0,
+        drugAllergyDetail || "",
+        hasUnderlyingDisease ? 1 : 0,
+        underlyingDiseaseDetail || "",
+        status || "pending"
+      ],
+    });
+
+    return NextResponse.json({ success: true, message: "จองคิวสำเร็จ" });
+
+  } catch (error) {
+    console.error("Appointment error:", error);
+    return NextResponse.json(
+      { error: "เกิดข้อผิดพลาดในการจองคิว", details: String(error) },
+      { status: 500 }
+    );
+  }
+}
