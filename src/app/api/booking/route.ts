@@ -5,7 +5,6 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-
     const {
       identificationNumber,
       time,
@@ -15,6 +14,7 @@ export async function POST(request: NextRequest) {
       lname,
       phoneNumber,
       sex,
+      birthDate, // 🐧 เพิ่มมาแล้ว
       isSmoking,
       isDrinking,
       hasFoodAllergy,
@@ -23,13 +23,14 @@ export async function POST(request: NextRequest) {
       drugAllergyDetail,
       hasUnderlyingDisease,
       underlyingDiseaseDetail,
-      status
+      status,
+      departmentId // 🐧 เพิ่มมาแล้ว
     } = body;
 
+    // ตรวจสอบข้อมูลที่จำเป็น
     if (!title || !identificationNumber || !fname || !lname || !date || !time) {
       return NextResponse.json({ error: "กรุณากรอกข้อมูลให้ครบถ้วน" }, { status: 400 });
     }
-
 
     const existingAppointment = await db.execute({
       sql: `SELECT identification_number FROM appointments 
@@ -41,14 +42,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "คุณมีคิวจองในวันและเวลานี้แล้ว" }, { status: 400 });
     }
 
-
+    // 🐧 เพิ่ม birth_date และ department_id ลงใน SQL และ Args
     await db.execute({
       sql: `INSERT INTO appointments (
-              identification_number, time, date, title, fname, lname, phone_number, sex, 
+              identification_number, time, date, title, fname, lname, phone_number, sex, birthDate,
               is_smoking, is_drinking, has_food_allergy, food_allergy_detail, 
-              has_drug_allergy, drug_allergy_detail, has_underlying_disease, underlying_disease_detail, status
+              has_drug_allergy, drug_allergy_detail, has_underlying_disease, underlying_disease_detail, 
+              status, departmentId
             ) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
         identificationNumber,
         time,
@@ -58,6 +60,7 @@ export async function POST(request: NextRequest) {
         lname,
         phoneNumber,
         sex,
+        birthDate,
         isSmoking ? 1 : 0,
         isDrinking ? 1 : 0,
         hasFoodAllergy ? 1 : 0,
@@ -66,7 +69,8 @@ export async function POST(request: NextRequest) {
         drugAllergyDetail || "",
         hasUnderlyingDisease ? 1 : 0,
         underlyingDiseaseDetail || "",
-        status || "pending"
+        status || "pending",
+        departmentId
       ],
     });
 
@@ -85,6 +89,10 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const id_number = searchParams.get("id_number");
+
+    if (!id_number) {
+      return NextResponse.json({ success: false, error: "Missing ID" }, { status: 400 });
+    }
 
     const data = await db.execute({
       sql: `SELECT * FROM appointments WHERE identification_number = ? ORDER BY date DESC, time DESC`,

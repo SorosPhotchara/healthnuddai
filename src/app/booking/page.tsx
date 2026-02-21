@@ -197,7 +197,7 @@ export default function BookingPage() {
     const payload = {
       identificationNumber: formData.idNumber,
       time: selectedTime,
-      date: selectedDate ? selectedDate.toISOString() : null,
+      date: selectedDate ? selectedDate.toISOString().split('T')[0] : null,
       title: formData.title,
       fname: formData.firstName,
       lname: formData.lastName,

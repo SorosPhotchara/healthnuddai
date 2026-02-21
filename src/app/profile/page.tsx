@@ -44,7 +44,10 @@ export default function ProfilePage() {
 
   const can_confirm = (appointmentTime: string) => {
     const now = new Date();
-    const currentHour = now.getHours();
+    const todayDate = now.toISOString().split('T')[0];
+    const currentHour = 8; // 
+
+    // const currentHour = now.getHours();
     const [hour] = appointmentTime.split(":").map(Number);
 
     if (hour < 12) {
