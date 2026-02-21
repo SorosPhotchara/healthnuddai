@@ -94,12 +94,22 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await db.execute({
-      sql: `SELECT * FROM appointments WHERE identification_number = ? ORDER BY date DESC, time DESC`,
+      sql: `
+        SELECT 
+          a.*, 
+          d.dno, 
+          d.name AS department_name 
+        FROM appointments a
+        LEFT JOIN department d ON a.departmentId = d.dno
+        WHERE a.identification_number = ? 
+        ORDER BY a.date DESC, a.time DESC
+      `,
       args: [id_number],
     });
 
     return NextResponse.json({ success: true, data: data.rows });
   } catch (error) {
+    console.error("Fetch error:", error);
     return NextResponse.json({ success: false, error: String(error) }, { status: 500 });
   }
 }
