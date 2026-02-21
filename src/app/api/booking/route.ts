@@ -80,3 +80,19 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id_number = searchParams.get("id_number");
+
+    const data = await db.execute({
+      sql: `SELECT * FROM appointments WHERE identification_number = ? ORDER BY date DESC, time DESC`,
+      args: [id_number],
+    });
+
+    return NextResponse.json({ success: true, data: data.rows });
+  } catch (error) {
+    return NextResponse.json({ success: false, error: String(error) }, { status: 500 });
+  }
+}
