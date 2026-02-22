@@ -197,7 +197,7 @@ export default function RegisterPage() {
                   value={form.identification_number}
                   onChange={handle_change}
                   className={styles.input}
-                  placeholder="0000000000000"
+                  placeholder="รหัสบัตร 13 หลัก"
                   required
                 />
               </div>
@@ -211,7 +211,7 @@ export default function RegisterPage() {
                   value={form.phone_number}
                   onChange={handle_change}
                   className={styles.input}
-                  placeholder="0000000000"
+                  placeholder="รหัสบัตร 10 หลัก"
                   required
                 />
               </div>
