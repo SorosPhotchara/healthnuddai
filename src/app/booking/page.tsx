@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react"; // เพิ่ม useRef
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/auth";
 import styles from "./booking.module.css";
@@ -14,7 +14,6 @@ const DEPT_ICONS: { [key: number]: string } = {
   6: "📋",
 };
 
-// ── [เปลี่ยน 1/4] แทน TIME_SLOTS ด้วย PERIODS + quota helper ──
 const PERIODS = [
   {
     id: "morning",
@@ -46,7 +45,6 @@ function dateToStr(d: Date) {
   return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 }
 
-// ── [เปลี่ยน 2/4] BirthDatePicker component ──
 const THAI_MONTHS_FULL = [
   "มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน",
   "กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม",
@@ -143,7 +141,6 @@ function BirthDatePicker({ value, onChange }: { value: Date | null; onChange: (d
     </div>
   );
 }
-// ── จบ BirthDatePicker ──
 
 export default function BookingPage() {
   const router = useRouter();
@@ -152,15 +149,13 @@ export default function BookingPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedDept, setSelectedDept] = useState<number | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [selectedTime, setSelectedTime] = useState<string | null>(null); // ยังคงชื่อเดิม ส่ง API เหมือนเดิม
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const [dbDepartments, setDbDepartments] = useState<any[]>([]);
 
-  // ── [เปลี่ยน 3/4] เพิ่ม birthDateObj state ──
   const [birthDateObj, setBirthDateObj] = useState<Date | null>(null);
 
-  // Form data for step 3 — ไม่เปลี่ยนแปลง
   const [formData, setFormData] = useState({
     idNumber: "",
     title: "",
@@ -179,7 +174,6 @@ export default function BookingPage() {
     underlyingDiseaseDetail: "",
   });
 
-  // handle เลือกวันเกิดจาก picker → format yyyy-mm-dd ส่ง API เหมือนเดิม
   const handleBirthSelect = (date: Date) => {
     setBirthDateObj(date);
     const yyyy = date.getFullYear();
@@ -239,7 +233,6 @@ export default function BookingPage() {
             const data = await response.json();
 
             if (data.success && data.user) {
-              // parse birthDate จาก API → Date สำหรับ picker
               if (data.user.birth_date) {
                 const parsed = new Date(data.user.birth_date);
                 if (!isNaN(parsed.getTime())) setBirthDateObj(parsed);
@@ -259,7 +252,7 @@ export default function BookingPage() {
           console.error("Error fetching user data:", error);
         }
       } else if (formData.idNumber.length === 13 && formData.idNumber !== user?.identification_number) {
-        setBirthDateObj(null); // reset picker
+        setBirthDateObj(null);
         setFormData(prev => ({
           ...prev,
           title: "", firstName: "", lastName: "", phone: "", sex: "", birthDate: ""
@@ -271,7 +264,6 @@ export default function BookingPage() {
   }, [formData.idNumber, user?.identification_number]);
 
 
-  // ฟังก์ชันสร้างปฏิทิน — ไม่เปลี่ยน
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -318,7 +310,7 @@ export default function BookingPage() {
   const handleDateSelect = (date: Date) => {
     if (isDateSelectable(date)) {
       setSelectedDate(date);
-      setSelectedTime(null); // reset period เมื่อเปลี่ยนวัน
+      setSelectedTime(null);
     }
   };
 
@@ -364,7 +356,7 @@ export default function BookingPage() {
   const handleSubmit = async () => {
     const payload = {
       identificationNumber: formData.idNumber,
-      time: selectedTime,           // ส่ง period id — ชื่อ field ยังเหมือนเดิม
+      time: selectedTime, 
       date: selectedDate ? selectedDate.toISOString().split('T')[0] : null,
       title: formData.title,
       fname: formData.firstName,
@@ -448,8 +440,6 @@ export default function BookingPage() {
       </div>
 
       <div className={styles.contentCard}>
-
-        {/* Step 1: เลือกแผนก — ไม่เปลี่ยน */}
         {currentStep === 1 && (
           <div className={styles.stepContent}>
             <h2 className={styles.stepTitle}>เลือกแผนกที่ต้องการ</h2>
@@ -461,7 +451,6 @@ export default function BookingPage() {
                   className={`${styles.deptCard} ${selectedDept === dept.dno ? styles.deptCardActive : ""}`}
                   onClick={() => handleDeptSelect(dept.dno)}
                 >
-                  {/* 🐧 ใช้ไอคอนตาม dno [cite: 2026-02-18] */}
                   <div className={styles.deptIcon}>{DEPT_ICONS[Number(dept.dno)] || "🏥"}</div>
                   <div className={styles.deptName}>{dept.name}</div>
                 </div>
@@ -471,13 +460,11 @@ export default function BookingPage() {
           </div>
         )}
 
-        {/* Step 2: เลือกวันและเวลา */}
         {currentStep === 2 && (
           <div className={styles.stepContent}>
             <h2 className={styles.stepTitle}>เลือกวันและเวลา</h2>
             <p className={styles.stepDescription}>กรุณาเลือกวันที่และช่วงเวลาที่สะดวก</p>
 
-            {/* ปฏิทิน — ไม่เปลี่ยน */}
             <div className={styles.calendarSection}>
               <div className={styles.calendarHeader}>
                 <button className={styles.monthBtn} onClick={handlePrevMonth}>-</button>
@@ -509,7 +496,6 @@ export default function BookingPage() {
               </div>
             </div>
 
-            {/* ── [เปลี่ยน 4/4] แทน timeGrid ด้วย period cards ── */}
             <div className={styles.timeSection}>
               <h3 className={styles.sectionTitle}>เลือกช่วงเวลา</h3>
               {!selectedDate ? (
@@ -545,7 +531,6 @@ export default function BookingPage() {
           </div>
         )}
 
-        {/* Step 3: กรอกข้อมูล */}
         {currentStep === 3 && (
           <div className={styles.stepContent}>
             <h2 className={styles.stepTitle}>กรอกข้อมูลผู้ป่วย</h2>
@@ -603,7 +588,6 @@ export default function BookingPage() {
                 />
               </div>
 
-              {/* ── [เปลี่ยน 3/4] แทน input type="date" ด้วย BirthDatePicker ── */}
               <div className={styles.formGroup}>
                 <label className={styles.label}>วัน/เดือน/ปีเกิด *</label>
                 <BirthDatePicker value={birthDateObj} onChange={handleBirthSelect} />
@@ -699,7 +683,6 @@ export default function BookingPage() {
           </div>
         )}
 
-        {/* Step 4: ยืนยันการจอง — ไม่เปลี่ยน */}
         {currentStep === 4 && (
           <div className={styles.stepContent}>
             <h2 className={styles.stepTitle}>ยืนยันการจองนัด</h2>
@@ -761,7 +744,6 @@ export default function BookingPage() {
           </div>
         )}
 
-        {/* Action Buttons — ไม่เปลี่ยน */}
         <div className={styles.actionButtons}>
           {currentStep > 1 && (
             <button className={styles.btnBack} onClick={handlePrevStep}>
@@ -790,7 +772,6 @@ export default function BookingPage() {
 
       </div>
 
-      {/* Footer — ไม่เปลี่ยน */}
       <footer className={styles.footer}>
         <p>© 2026 Software Development | สุขภาพนัดได้</p>
         <p>Present by Group 3</p>
