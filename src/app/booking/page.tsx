@@ -212,16 +212,16 @@ export default function BookingPage() {
     }
   };
 
-  // useEffect(() => {
-  //   load_user();
-  //   fetchDepartments();
-  // }, [load_user, fetchDepartments]);
+  useEffect(() => {
+    load_user();
+    fetchDepartments();
+  }, [load_user, fetchDepartments]);
 
-  // useEffect(() => {
-  //   if (!isLoading && !user) {
-  //     router.push("/login");
-  //   }
-  // }, [isLoading, user, router]);
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/login");
+    }
+  }, [isLoading, user, router]);
 
   useEffect(() => {
     const fetchUserData = async () => {
