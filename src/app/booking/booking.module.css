@@ -628,6 +628,10 @@
     grid-template-columns: repeat(3, 1fr);
   }
 
+  .periodGrid {
+    grid-template-columns: 1fr;
+  }
+
   .formRow {
     grid-template-columns: 1fr;
   }
@@ -645,6 +649,10 @@
   .summaryValue {
     text-align: left;
   }
+
+  .bpPopup {
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
@@ -661,3 +669,352 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ==============================================
+   เพิ่มใหม่: Period Cards (ช่วงเช้า/ช่วงบ่าย)
+   ============================================== */
+.selectDateFirst {
+  text-align: center;
+  color: #9E9E9E;
+  padding: 2rem;
+  background: #F5F5F5;
+  border-radius: 12px;
+  font-size: 0.95rem;
+}
+
+.periodGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+.periodCard {
+  background: white;
+  border: 2px solid #E0E0E0;
+  border-radius: 20px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.periodCard:hover:not(.periodCardFull) {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(76, 175, 136, 0.18);
+  border-color: #4CAF88;
+}
+
+.periodCardSelected {
+  background: linear-gradient(135deg, #4CAF88 0%, #5BC4A8 100%);
+  border-color: #4CAF88;
+  box-shadow: 0 10px 24px rgba(76, 175, 136, 0.35);
+}
+
+.periodCardFull {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #F5F5F5;
+}
+
+.periodIcon {
+  font-size: 3rem;
+  margin-bottom: 0.25rem;
+}
+
+.periodLabel {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #2C3E50;
+}
+
+.periodCardSelected .periodLabel { color: white; }
+
+.periodTime {
+  font-size: 0.95rem;
+  color: #757575;
+  font-weight: 500;
+}
+
+.periodCardSelected .periodTime { color: rgba(255, 255, 255, 0.85); }
+
+.periodSlots {
+  font-size: 0.78rem;
+  color: #9E9E9E;
+  background: #F5F5F5;
+  border-radius: 8px;
+  padding: 0.4rem 0.75rem;
+  line-height: 1.6;
+}
+
+.periodCardSelected .periodSlots {
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.periodAvailability {
+  display: inline-block;
+  padding: 0.45rem 1rem;
+  background: #E8F5E9;
+  color: #2E7D32;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+
+.periodCardSelected .periodAvailability {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+}
+
+.periodFull {
+  background: #FFEBEE !important;
+  color: #C62828 !important;
+}
+
+/* ==============================================
+   เพิ่มใหม่: Birth Date Picker
+   ============================================== */
+.bpWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.bpTrigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border: 1.5px solid #E0E0E0;
+  border-radius: 8px;
+  background: #FAFAFA;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  font-size: 0.95rem;
+  text-align: left;
+  color: #334155;
+  box-sizing: border-box;
+}
+
+.bpTrigger:hover { border-color: #4CAF88; background: white; }
+.bpTriggerFilled { border-color: #4CAF88; background: white; }
+.bpTrigger:focus { outline: none; border-color: #4CAF88; box-shadow: 0 0 0 3px rgba(76,175,136,0.12); }
+.bpTriggerIcon { font-size: 1.1rem; flex-shrink: 0; }
+.bpTriggerPlaceholder { color: #94a3b8; flex: 1; }
+.bpTriggerValue { color: #334155; font-weight: 500; flex: 1; }
+.bpTriggerChevron { font-size: 0.6rem; color: #9E9E9E; flex-shrink: 0; }
+
+.bpPopup {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 9999;
+  width: 320px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.16);
+  border: 1px solid #E8F5E9;
+  overflow: hidden;
+  animation: bpIn 0.18s ease;
+}
+
+@keyframes bpIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.bpHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #4CAF88 0%, #5BC4A8 100%);
+  padding: 0.875rem 1rem;
+}
+
+.bpHeaderCenter {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+}
+
+.bpHeaderBtn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+
+.bpHeaderBtn:hover { background: rgba(255,255,255,0.35); }
+.bpModeTitle { color: white; font-weight: 700; font-size: 0.9rem; }
+
+.bpNavBtn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  font-family: inherit;
+  flex-shrink: 0;
+}
+
+.bpNavBtn:hover { background: rgba(255,255,255,0.35); }
+
+.bpCloseBtn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  font-size: 0.8rem;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  font-family: inherit;
+  flex-shrink: 0;
+}
+
+.bpCloseBtn:hover { background: rgba(255,255,255,0.35); }
+
+.bpWeekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 0.75rem 0.75rem 0.25rem;
+  gap: 0.2rem;
+}
+
+.bpWeekday {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #9E9E9E;
+  padding: 0.2rem 0;
+}
+
+.bpDays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 0 0.75rem 0.5rem;
+  gap: 0.15rem;
+}
+
+.bpDay {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #2C3E50;
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.bpDay:hover { background: #E8F5E9; color: #4CAF88; }
+
+.bpDaySelected {
+  background: #4CAF88 !important;
+  color: white !important;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(76,175,136,0.4);
+}
+
+.bpMonthGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  padding: 1rem 0.75rem;
+}
+
+.bpMonthBtn {
+  padding: 0.6rem 0.25rem;
+  border: 1px solid #E0E0E0;
+  border-radius: 8px;
+  background: white;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #2C3E50;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.bpMonthBtn:hover { border-color: #4CAF88; color: #4CAF88; background: #E8F5E9; }
+.bpMonthSelected { background: #4CAF88 !important; border-color: #4CAF88 !important; color: white !important; font-weight: 700; }
+
+.bpYearList {
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 0.5rem 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.4rem;
+}
+
+.bpYearList::-webkit-scrollbar { width: 4px; }
+.bpYearList::-webkit-scrollbar-thumb { background: #C8E6C9; border-radius: 4px; }
+
+.bpYearBtn {
+  padding: 0.5rem 0.25rem;
+  border: 1px solid #E0E0E0;
+  border-radius: 8px;
+  background: white;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #2C3E50;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  text-align: center;
+}
+
+.bpYearBtn:hover { border-color: #4CAF88; color: #4CAF88; background: #E8F5E9; }
+.bpYearSelected { background: #4CAF88 !important; border-color: #4CAF88 !important; color: white !important; font-weight: 700; }
+
+.bpFooter {
+  text-align: center;
+  font-size: 0.72rem;
+  color: #BDBDBD;
+  padding: 0.5rem 1rem 0.75rem;
+  border-top: 1px solid #F5F5F5;
+}
+
+.bpSelectedHint {
+  margin-top: 0.5rem;
+  font-size: 0.82rem;
+  color: #757575;
+  background: #F1FFF8;
+  border: 1px solid #C8E6C9;
+  border-radius: 8px;
+  padding: 0.4rem 0.75rem;
+}
+
+.bpSelectedHint strong { color: #2E7D32; }
