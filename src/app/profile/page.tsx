@@ -150,92 +150,113 @@ export default function ProfilePage() {
 
   return (
     <div className={styles.container}>
+      {/* ================= PROFILE CARD ================= */}
       <div className={styles.profileCard}>
         <div className={styles.avatarSection}>
-          <div className={styles.avatar}><span className={styles.avatarIcon}>👤</span></div>
-          <h1 className={styles.userName}>{user?.title || ""}{user?.fname} {user?.lname}</h1>
+          <div className={styles.avatar}>
+            <span className={styles.avatarIcon}>👤</span>
+          </div>
+          <h1 className={styles.userName}>
+            {user?.title || ""}
+            {user?.fname} {user?.lname}
+          </h1>
         </div>
         <button className={styles.editButton}>แก้ไขโปรไฟล์</button>
       </div>
 
-      <div className={styles.appointmentSection}>
-        <h2 className={styles.sectionTitle}>นัดที่กำลังจะมาถึง</h2>
-        {upcoming.length > 0 ? (
-          upcoming.map((ap) => {
-            const isConfirmable = can_confirm(ap.time, ap.date);
-            return (
-              <div key={ap.ap_id} className={styles.upcomingCard}>
-                <div className={styles.countdownBanner}>
-                  {isConfirmable
-                    ? "✨ ขณะนี้เปิดให้กดยืนยันการมาตามนัดแล้ว"
-                    : "⌛ กรุณายืนยันนัดในวันที่นัดหมาย (เช้า 08:00-09:00 / บ่าย 12:00-13:00)"}
-                </div>
-                <div className={styles.appointmentInfo}>
-                  <div className={styles.appointmentDate}>
-                    <h3 className={styles.dateText}>{ap.date?.split('T')[0]}</h3>
-                    <p className={styles.timeText}>เวลา {ap.time} น.</p>
-                    <span className={styles.statusBadge}>รอยืนยัน</span>
-                  </div>
-                  <div className={styles.appointmentDetails}>
-                    <p>
-                      <span className={styles.detailLabel}>แผนก:</span>
-                      <span className={styles.deptHighlight}>
-                        {DEPT_ICONS[ap.dno] || "🏥"} {ap.department_name || "แผนกทั่วไป"}
-                      </span>
-                    </p>
-                    <p><span className={styles.detailLabel}>รหัสนัด:</span> {ap.ap_id}</p>
-                  </div>
-                </div>
-                <div className={styles.appointmentActions}>
-                  <button
-                    className={styles.confirmButton}
-                    onClick={() => handle_status_update(ap.ap_id, "done")}
-                    disabled={!isConfirmable || isActionLoading}
-                  >
-                    ยืนยันนัด
-                  </button>
-                  <button className={styles.rescheduleButton} onClick={() => alert("ระบบเลื่อนนัดกำลังพัฒนา")}>เลื่อนนัด</button>
-                  <button
-                    className={styles.cancelButton}
-                    onClick={() => handle_status_update(ap.ap_id, "cancel")}
-                    disabled={isActionLoading}
-                  >
-                    ยกเลิก
-                  </button>
-                </div>
-              </div>
-            );
-          })
-        ) : (
-          <div className={styles.noData}>ไม่มีรายการนัดหมายที่รอยืนยัน</div>
-        )}
-      </div>
+      {/* ================= APPOINTMENT CARD ================= */}
+      <div className={styles.appointmentCard}>
 
-      <div className={styles.historySection}>
-        <h2 className={styles.sectionTitle}>ประวัติการนัดหมาย</h2>
-        <div className={styles.historyList}>
-          {history.length > 0 ? history.map((item) => {
-            return (
-              <div key={item.ap_id} className={styles.historyCard}>
-                <div className={styles.historyDate}>{item.date?.split('T')[0]}</div>
-                <div className={styles.historyContent}>
-                  <p>🕑 เวลา {item.time} น.</p>
-                  <p>{DEPT_ICONS[item.dno] || "🏥"} แผนก {item.department_name || "ทั่วไป"} (รหัส: {item.ap_id})</p>
+        {/* ===== UPCOMING ===== */}
+        <div className={styles.subSection}>
+          <h3 className={styles.subTitle}>นัดที่กำลังจะมาถึง</h3>
+
+          {upcoming.length > 0 ? (upcoming.map((ap) => {const isConfirmable = can_confirm(ap.time, ap.date);
+
+              return (
+                <div key={ap.ap_id} className={styles.upcomingCard}>
+                  <div className={styles.countdownBanner}>
+                    {isConfirmable
+                      ? "✨ ขณะนี้เปิดให้กดยืนยันการมาตามนัดแล้ว"
+                      : "⌛ กรุณายืนยันในวันนัด (08:00-09:00 / 12:00-13:00)"}
+                  </div>
+
+                  <div className={styles.appointmentInfo}>
+                    <div className={styles.appointmentDate}>
+                      <h3 className={styles.dateText}>
+                        {ap.date?.split("T")[0]}
+                      </h3>
+                      <p className={styles.timeText}>เวลา {ap.time} น.</p>
+                      <span className={styles.statusBadge}>รอยืนยัน</span>
+                    </div>
+
+                    <div className={styles.appointmentDetails}>
+                      <p>
+                        <span className={styles.detailLabel}>แผนก:</span>
+                        <span className={styles.deptHighlight}>{DEPT_ICONS[ap.dno] || "🏥"}{" "} {ap.department_name || "แผนกทั่วไป"} </span>
+                      </p>
+                      <p><span className={styles.detailLabel}>รหัสนัด:</span>{" "}{ap.ap_id}</p>
+                    </div>
+                  </div>
+
+                  <div className={styles.appointmentActions}>
+                    <button className={styles.confirmButton}
+                      onClick={() => handle_status_update(ap.ap_id,"done")}
+                      disabled={ !isConfirmable || isActionLoading}>
+                      ยืนยันนัด
+                    </button>
+
+                    <button className={styles.rescheduleButton}
+                      onClick={() => alert("ระบบเลื่อนนัดกำลังพัฒนา")}>
+                      เลื่อนนัด
+                    </button>
+
+                    <button className={styles.cancelButton}
+                      onClick={() => handle_status_update(ap.ap_id,"cancel")}
+                      disabled={isActionLoading}>
+                      ยกเลิก
+                    </button>
+                  </div>
                 </div>
-                <span className={`${styles.historyStatus} ${item.status === 'done' ? styles.statusComplete : styles.statusCancel
-                  }`}>
-                  {item.status === 'done' ? "เสร็จสิ้น" : "ยกเลิก"}
+              );
+            })
+          ):(
+            <div className={styles.noData}>
+              ไม่มีรายการนัดหมายที่รอยืนยัน
+            </div>
+          )}
+        </div>
+
+        <div className={styles.divider}></div>
+
+        {/* ===== HISTORY ===== */}
+        <div className={styles.subSection}>
+          <h3 className={styles.subTitle}>
+            ประวัติการนัดหมาย
+          </h3>
+
+          {history.length > 0 ? (
+            history.map((item) => (
+              <div key={item.ap_id} className={styles.historyCard}>
+                <div className={styles.historyDate}>
+                  {item.date?.split("T")[0]}
+                </div>
+
+                <div className={styles.historyContent}>
+                  <p>เวลา {item.time} น.</p>
+                  <p>{DEPT_ICONS[item.dno] || "🏥"}{" "} แผนก{" "} {item.department_name || "ทั่วไป"}{" "} (รหัส: {item.ap_id}) </p>
+                </div>
+
+                <span className={`${styles.historyStatus} ${item.status === "done" ? styles.statusComplete : styles.statusCancel}`}>
+                  {item.status === "done" ? "เสร็จสิ้น" : "ยกเลิก"}
                 </span>
               </div>
-            );
-          }) : <p className={styles.noData}>ยังไม่มีประวัติการนัดหมาย</p>}
+            ))
+          ):(
+            <p className={styles.noData}>ยังไม่มีประวัติการนัดหมาย </p>
+          )}
         </div>
       </div>
-
-      <footer className={styles.footer}>
-        <p>© 2026 Software Development | สุขภาพนัดได้</p>
-        <p>Present by Group 3</p>
-      </footer>
     </div>
   );
 }
