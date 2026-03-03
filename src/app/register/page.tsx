@@ -211,7 +211,7 @@ export default function RegisterPage() {
                   value={form.phone_number}
                   onChange={handle_change}
                   className={styles.input}
-                  placeholder="รหัสบัตร 10 หลัก"
+                  placeholder="เบอร์โทรศัพท์ 10 หลัก"
                   required
                 />
               </div>
