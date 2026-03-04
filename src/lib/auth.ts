@@ -11,6 +11,7 @@ interface User {
   phone_number: string;
   role: string;
   birth_date: string;
+  dno?: number | null;
 }
 
 interface AuthState {

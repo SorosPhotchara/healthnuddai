@@ -39,6 +39,14 @@ export default function Navbar() {
     { href: "/guide", label: "คู่มือ/วิธีใช้" },
   ];
 
+
+  const displayNavItems = NAV_ITEMS.map((item) => {
+    if (item.label === "คิวเรียลไทม์" && (user?.role === "doctor" || user?.role === "staff")) {
+      return { ...item, href: "/managequeue" }; 
+    }
+    return item; 
+  });
+
 const NotifyBell = () => (
   <div className={styles.notifyWrapper}>
     <button
@@ -87,7 +95,7 @@ const NotifyBell = () => (
         สุขภาพนัดได้
       </Link>
       <div className={styles.navLinks}>
-        {NAV_ITEMS.map((item) => (
+        {displayNavItems.map((item) => (
           <Link
             key={item.href}
             href={item.href}
@@ -128,7 +136,7 @@ const NotifyBell = () => (
       </button>
 
       <div className={`${styles.mobileMenu} ${isMenuOpen ? styles.mobileMenuOpen : ""}`}>
-        {NAV_ITEMS.map((item) => (
+        {displayNavItems.map((item) => (
           <Link
             key={item.href}
             href={item.href}
