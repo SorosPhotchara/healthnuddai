@@ -25,7 +25,7 @@ const MOCK_DOCTORS: Doctor[] = [
     specialty: "กระดูกและข้อ",
     available_days: "จ อ พ",
     available_time: "08:00-12:00",
-    image: "/doctors/doctor1.jpg",
+    image: "https://png.pngtree.com/png-clipart/20231002/original/pngtree-young-afro-professional-doctor-png-image_13227671.png",
   },
   {
     id: 2,
@@ -35,27 +35,27 @@ const MOCK_DOCTORS: Doctor[] = [
     specialty: "โรคหัวใจและหลอดเลือด",
     available_days: "อ พ ศ",
     available_time: "09:00-12:00",
-    image: "/doctors/doctor2.jpg",
+    image: "https://static.vecteezy.com/system/resources/previews/041/408/858/non_2x/ai-generated-a-smiling-doctor-with-glasses-and-a-white-lab-coat-isolated-on-transparent-background-free-png.png",
   },
   {
     id: 3,
     name: "พญ.สุดา สวยงาม",
     title: "พญ.",
     department: "แผนกกันยาวรรม",
-    specialty: "ฮอร์โมนและทันศรรมสตรีตรวางวัย",
+    specialty: "ฮอร์โมนและสูตินรีเวช",
     available_days: "อ พฤ ศ",
     available_time: "13:00-16:00",
-    image: "/doctors/doctor3.jpg",
+    image: "https://png.pngtree.com/png-vector/20250415/ourmid/pngtree-female-doctor-portrait-in-white-png-image_15971053.png",
   },
   {
     id: 4,
     name: "พญ.มาลี รักษ์ดี",
     title: "พญ.",
     department: "แผนกจุลกรรมวอร์กรรม",
-    specialty: "ผิวหลังและไสรภ์",
+    specialty: "ผิวหนังและความงาม",
     available_days: "จ-ศ",
     available_time: "09:00-15:00",
-    image: "/doctors/doctor4.jpg",
+    image: "https://png.pngtree.com/png-vector/20250409/ourmid/pngtree-portrait-of-female-doctor-png-image_15971061.png",
   },
   {
     id: 5,
@@ -65,7 +65,7 @@ const MOCK_DOCTORS: Doctor[] = [
     specialty: "ศัลยกรรมทั่วไป",
     available_days: "จ อ พฤ",
     available_time: "08:00-11:00",
-    image: "/doctors/doctor5.jpg",
+    image: "https://png.pngtree.com/png-vector/20250826/ourmid/pngtree-professional-african-american-doctor-smiling-in-white-uniform-png-image_17312686.webp",
   },
   {
     id: 6,
@@ -75,7 +75,7 @@ const MOCK_DOCTORS: Doctor[] = [
     specialty: "เวชศาสตร์ป้องกัน",
     available_days: "อ พ ศ",
     available_time: "13:00-16:00",
-    image: "/doctors/doctor6.jpg",
+    image: "https://png.pngtree.com/png-clipart/20240220/original/pngtree-portrait-of-a-smiling-handsome-male-doctor-man-png-image_14366794.png",
   },
 ];
 
@@ -165,36 +165,36 @@ export default function DoctorsPage() {
                     <li key={idx}>{service}</li>
                   ))}
                 </ul>
-                <button className={styles.detailButton}>ดูแพทย์ในแผนก</button>
+              
               </div>
             ))}
           </div>
         )}
 
         {/* Doctors Grid */}
-        {activeTab === "doctors" && (
-          <div className={styles.doctorsGrid}>
-            {MOCK_DOCTORS.map((doctor) => (
-              <div key={doctor.id} className={styles.doctorCard}>
-                <div className={styles.doctorImage}>
-                  <div className={styles.imagePlaceholder}>
-                    <span>👨‍⚕️</span>
-                  </div>
-                </div>
-                <div className={styles.doctorInfo}>
-                  <h3 className={styles.doctorName}>{doctor.name}</h3>
-                  <p className={styles.doctorDepartment}>
-                    {doctor.department} | {doctor.specialty}
-                  </p>
-                  <p className={styles.doctorSchedule}>
-                    วันทำการ: {doctor.available_days} ({doctor.available_time})
-                  </p>
-                  <button className={styles.detailButton}>ดูรายละเอียด</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+       {activeTab === "doctors" && (
+  <div className={styles.doctorsGrid}>
+    {MOCK_DOCTORS.map((doctor) => (
+      <div key={doctor.id} className={styles.doctorCard}>
+        <div className={styles.doctorImage}>
+          {doctor.image ? (
+            <img src={doctor.image} alt={doctor.name} className={styles.doctorImg} />
+          ) : (
+            <div className={styles.imagePlaceholder}>👨‍⚕️</div>
+          )}
+        </div>
+        <div className={styles.doctorInfo}>
+          <h3 className={styles.doctorName}>{doctor.name}</h3>
+          <p className={styles.doctorDepartment}>{doctor.department}</p>
+          <p className={styles.doctorSpecialty}>{doctor.specialty}</p>
+          <p className={styles.doctorSchedule}>
+            🗓 {doctor.available_days} · {doctor.available_time}
+          </p>
+        </div>
+      </div>
+    ))}
+  </div>
+)}
       </div>
 
       {/* Footer */}

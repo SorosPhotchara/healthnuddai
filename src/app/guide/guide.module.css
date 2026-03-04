@@ -176,7 +176,7 @@
 }
 
 .contactInfo strong {
-  color: #3d9d82;
+  color: #2d3748;
 }
 
 /* Footer */
@@ -218,3 +218,35 @@
     font-size: 0.8rem;
   }
 }
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.tab {
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #718096;
+  padding: 0.5rem 1.25rem;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  color: #3d9d82;
+}
+
+.tabActive {
+  color: #3d9d82;
+  font-weight: 700;
+  border-bottom-color: #3d9d82;
+}
+

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/auth";
 import styles from "./profile.module.css";
@@ -19,6 +19,8 @@ export default function ProfilePage() {
   const { user, isLoading, load_user } = useAuthStore();
   const [appointments, setAppointments] = useState<any[]>([]);
   const [isActionLoading, setIsActionLoading] = useState(false);
+  const [avatarUrl, set_avatar_url] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null); 
 
   const fetchAppointments = useCallback(async () => {
     if (user?.identification_number) {
@@ -80,6 +82,47 @@ export default function ProfilePage() {
     return false;
   };
 
+  const [editOpen, set_edit_open] = useState(false);
+  const [editForm, set_edit_form] = useState({ phone_number: "", password: "", confirmPassword: "" });
+  const [editLoading, set_edit_loading] = useState(false);
+  const [editMessage, set_edit_message] = useState<{ text: string; type: "error" | "success" } | null>(null);
+
+  const handle_edit_submit = async () => {
+    if (editForm.password && editForm.password !== editForm.confirmPassword) {
+      set_edit_message({ text: "รหัสผ่านไม่ตรงกัน", type: "error" });
+      return;
+    }
+    if (editForm.phone_number && editForm.phone_number.length !== 10) {
+      set_edit_message({ text: "เบอร์โทรต้อง 10 หลัก", type: "error" });
+      return;
+    }
+
+    set_edit_loading(true);
+    try {
+      const body: any = { identification_number: user?.identification_number };
+      if (editForm.phone_number) body.phone_number = editForm.phone_number;
+      if (editForm.password) body.password = editForm.password;
+
+      const res = await fetch("/api/user/update", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        set_edit_message({ text: "อัปเดตสำเร็จ! ✅", type: "success" });
+        load_user();
+        setTimeout(() => { set_edit_open(false); set_edit_message(null); }, 1500);
+      } else {
+        set_edit_message({ text: data.error || "เกิดข้อผิดพลาด", type: "error" });
+      }
+    } catch {
+      set_edit_message({ text: "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้", type: "error" });
+    } finally {
+      set_edit_loading(false);
+    }
+  };
 
   useEffect(() => {
     const autoCancelExpired = async () => {
@@ -176,14 +219,57 @@ export default function ProfilePage() {
       <div className={styles.profileCard}>
         <div className={styles.avatarSection}>
           <div className={styles.avatar}>
-            <span className={styles.avatarIcon}>👤</span>
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="avatar" className={styles.avatarImg} />
+            ) : (
+              <div className={styles.avatarInitial}>
+                {user?.fname?.charAt(0) || "?"}
+              </div>
+            )}
+            <div className={styles.avatarOverlay}></div>
           </div>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) set_avatar_url(URL.createObjectURL(file));
+            }}
+          />
           <h1 className={styles.userName}>
-            {user?.title || ""}
-            {user?.fname} {user?.lname}
+            {user?.title || ""}{user?.fname} {user?.lname}
           </h1>
         </div>
-        <button className={styles.editButton}>แก้ไขโปรไฟล์</button>
+
+        <div className={styles.infoRow}>
+          <div>
+            <p className={styles.infoLabel}>เลขบัตรประชาชน</p>
+            <p className={styles.infoValue}>{user?.identification_number || "-"}</p>
+          </div>
+          <div>
+            <p className={styles.infoLabel}>เบอร์โทรศัพท์</p>
+            <p className={styles.infoValue}>{user?.phone_number || "-"}</p>
+          </div>
+          <div>
+            <p className={styles.infoLabel}>อีเมล</p>
+            <p className={styles.infoValue}>{user?.email || "-"}</p>
+          </div>
+          <div>
+            <p className={styles.infoLabel}>วันเกิด</p>
+            <p className={styles.infoValue}>{user?.birth_date?.split("T")[0] || "-"}</p>
+          </div>
+        </div>
+
+        <button className={styles.editButton} onClick={() => {
+          set_edit_open(true);
+          set_edit_form({ phone_number: "", password: "", confirmPassword: "" });
+          set_edit_message(null);
+        }}>
+          แก้ไขโปรไฟล์
+        </button>
       </div>
 
       {/* ================= APPOINTMENT CARD ================= */}
@@ -288,6 +374,77 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
+
+      {editOpen && (
+        <>
+          <div className={styles.modalBackdrop} onClick={() => set_edit_open(false)} />
+          <div className={styles.modal}>
+            <h2 className={styles.modalTitle}>แก้ไขโปรไฟล์</h2>
+
+            {/* รูปภาพ */}
+            <div className={styles.modalAvatarWrap}>
+              <div className={styles.modalAvatar} onClick={() => fileInputRef.current?.click()}>
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="avatar" className={styles.avatarImg} />
+                ) : (
+                  <div className={styles.avatarInitial}>{user?.fname?.charAt(0) || "?"}</div>
+                )}
+                <div className={styles.avatarOverlay}></div>
+              </div>
+              <p className={styles.modalAvatarHint}>คลิกเพื่อเปลี่ยนรูป</p>
+            </div>
+
+            {/* เบอร์โทร */}
+            <div className={styles.modalField}>
+              <label className={styles.modalLabel}>เบอร์โทรศัพท์ใหม่</label>
+              <input
+                type="text"
+                maxLength={10}
+                placeholder={user?.phone_number || "กรอกเบอร์โทรใหม่"}
+                value={editForm.phone_number}
+                onChange={(e) => set_edit_form(f => ({ ...f, phone_number: e.target.value.replace(/\D/g, "") }))}
+                className={styles.modalInput}
+              />
+            </div>
+
+            {/* รหัสผ่าน */}
+            <div className={styles.modalField}>
+              <label className={styles.modalLabel}>รหัสผ่านใหม่</label>
+              <input
+                type="password"
+                placeholder="ปล่อยว่างถ้าไม่เปลี่ยน"
+                value={editForm.password}
+                onChange={(e) => set_edit_form(f => ({ ...f, password: e.target.value }))}
+                className={styles.modalInput}
+              />
+            </div>
+
+            <div className={styles.modalField}>
+              <label className={styles.modalLabel}>ยืนยันรหัสผ่านใหม่</label>
+              <input
+                type="password"
+                placeholder="ยืนยันรหัสผ่าน"
+                value={editForm.confirmPassword}
+                onChange={(e) => set_edit_form(f => ({ ...f, confirmPassword: e.target.value }))}
+                className={styles.modalInput}
+              />
+            </div>
+
+            {editMessage && (
+              <p className={`${styles.modalMessage} ${editMessage.type === "error" ? styles.modalError : styles.modalSuccess}`}>
+                {editMessage.text}
+              </p>
+            )}
+
+            <div className={styles.modalActions}>
+              <button className={styles.modalCancel} onClick={() => set_edit_open(false)}>ยกเลิก</button>
+              <button className={styles.modalSave} onClick={handle_edit_submit} disabled={editLoading}>
+                {editLoading ? "กำลังบันทึก..." : "บันทึก"}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

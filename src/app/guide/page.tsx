@@ -37,16 +37,16 @@ const BOOKING_STEPS = [
 ];
 
 const MANAGEMENT_ITEMS = [
-  {
-    id: "check-queue",
-    title: "วิธีตรวจสอบคิวของฉัน",
-    content: [
-      '1.คลิกเมนู "ตรวจสอบนัด"',
-      "2.กรอก รหัสนัด + เบอร์โทรศัพท์",
-      '3.กดปุ่ม "ค้นหา"',
-      "4.ระบบจะแสดง: วันที่และเวลานัด, ชื่อแพทย์และแผนก, ห้องตรวจ, สถานะการนัด",
-    ],
-  },
+  // {
+  //   id: "check-queue",
+  //   title: "วิธีตรวจสอบคิวของฉัน",
+  //   content: [
+  //     '1.คลิกเมนู "ตรวจสอบนัด"',
+  //     "2.กรอก รหัสนัด + เบอร์โทรศัพท์",
+  //     '3.กดปุ่ม "ค้นหา"',
+  //     "4.ระบบจะแสดง: วันที่และเวลานัด, ชื่อแพทย์และแผนก, ห้องตรวจ, สถานะการนัด",
+  //   ],
+  // },
   {
     id: "cancel",
     title: "วิธียกเลิกหรือเลื่อนนัด",
@@ -244,7 +244,10 @@ export default function GuidePage() {
         <h2 className={styles.sectionTitle}>ติดต่อสอบถาม</h2>
         <div className={styles.stepsCard}>
           <div className={styles.contactInfo}>
-            <p>ไม่บอก</p>
+            <p>📞 <strong>โทรศัพท์:</strong> 02-xxx-xxxx</p>
+            <p>📧 <strong>อีเมล:</strong> contact@hospital.com</p>
+            <p>🕐 <strong>เวลาทำการ:</strong> จันทร์ - ศุกร์ 08:00 - 17:00 น.</p>
+            <p>📍 <strong>ที่อยู่:</strong> 123 ถนนxxx แขวงxxx เขตxxx กรุงเทพฯ 10xxx</p>
           </div>
         </div>
       </div>

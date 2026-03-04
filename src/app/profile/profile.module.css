@@ -55,10 +55,21 @@
   display: flex;
   justify-content: space-around;
   margin-bottom: 1.5rem;
+  gap: 1rem;
+  text-align: center;
+  color: white;
+  flex-wrap: wrap;
+}
+
+.infoLabel {
+  font-size: 0.75rem;
+  opacity: 0.75;
+  margin-bottom: 0.25rem;
 }
 
 .infoValue {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .editButton {
@@ -447,4 +458,176 @@
   .footer {
     margin: 2rem -1rem 0 -1rem;
   }
+}
+
+.avatar {
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.avatarInitial {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #48bb98, #2d9d78);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: white;
+}
+
+/* Modal */
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 420px;
+  z-index: 201;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.modalTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.modalAvatarWrap {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.modalAvatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  margin: 0 auto 0.5rem;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border: 3px solid #48bb98;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+}
+
+.modalAvatarHint {
+  font-size: 0.75rem;
+  color: #a0aec0;
+}
+
+.modalField {
+  margin-bottom: 1rem;
+}
+
+.modalLabel {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 0.375rem;
+}
+
+.modalInput {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border 0.2s;
+  box-sizing: border-box;
+  color: #2d3748;
+}
+
+.modalInput:focus {
+  border-color: #48bb98;
+}
+
+.modalMessage {
+  font-size: 0.875rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+.modalError {
+  background: #fff5f5;
+  color: #e53e3e;
+}
+
+.modalSuccess {
+  background: #f0fdf4;
+  color: #276749;
+}
+
+.modalActions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.modalCancel {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid #e2e8f0;
+  background: white;
+  color: #718096;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modalCancel:hover {
+  border-color: #a0aec0;
+}
+
+.modalSave {
+  flex: 1;
+  padding: 0.75rem;
+  background: #48bb98;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modalSave:hover {
+  background: #3d9d82;
+}
+
+.modalSave:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
