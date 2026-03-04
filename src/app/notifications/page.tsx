@@ -10,22 +10,14 @@ type Notification = {
   message: string;
   time: string;
   read: boolean;
-  type: "appointment" | "queue" | "medicine" | "system";
+  type: "appointment" | "queue" | "system";
+  queueNumber?: number;
+  currentQueue?: number;
 };
-
-const MOCK_NOTIFICATIONS: Notification[] = [
-  { id: 1, title: "ยืนยันนัดหมาย", message: "นัดหมายของคุณวันที่ 10 มี.ค. เวลา 10:00 น. ได้รับการยืนยันแล้ว", time: "5 นาทีที่แล้ว", read: false, type: "appointment" },
-  { id: 2, title: "แจ้งเตือนคิว", message: "คุณอยู่ในลำดับที่ 3 กรุณาเตรียมตัว", time: "20 นาทีที่แล้ว", read: false, type: "queue" },
-  { id: 3, title: "ใบสั่งยา", message: "ใบสั่งยาของคุณพร้อมแล้ว สามารถรับได้ที่เคาน์เตอร์ยา", time: "1 ชั่วโมงที่แล้ว", read: true, type: "medicine" },
-  { id: 4, title: "ยืนยันนัดหมาย", message: "นัดหมายของคุณวันที่ 5 มี.ค. เวลา 14:00 น. ได้รับการยืนยันแล้ว", time: "1 วันที่แล้ว", read: true, type: "appointment" },
-  { id: 5, title: "แจ้งเตือนระบบ", message: "ระบบจะปิดปรับปรุงในวันที่ 15 มี.ค. เวลา 00:00 - 06:00 น.", time: "2 วันที่แล้ว", read: true, type: "system" },
-  { id: 6, title: "แจ้งเตือนคิว", message: "ถึงคิวของคุณแล้ว กรุณาเข้าห้องตรวจ 3", time: "3 วันที่แล้ว", read: true, type: "queue" },
-];
 
 const TYPE_ICON: Record<Notification["type"], string> = {
   appointment: "📅",
   queue: "🔢",
-  medicine: "💊",
   system: "⚙️",
 };
 

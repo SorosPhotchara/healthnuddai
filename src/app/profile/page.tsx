@@ -20,7 +20,7 @@ export default function ProfilePage() {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [avatarUrl, set_avatar_url] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null); 
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchAppointments = useCallback(async () => {
     if (user?.identification_number) {
@@ -53,12 +53,12 @@ export default function ProfilePage() {
 
   const is_expired = (appointmentDate: string, appointmentTime: string) => {
     if (!appointmentDate || !appointmentTime) return false;
-    
+
     const now = new Date();
     const apDateStr = appointmentDate.split('T')[0];
     const [apYear, apMonth, apDay] = apDateStr.split('-').map(Number);
     const apDate = new Date(apYear, apMonth - 1, apDay);
-    
+
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     // ถ้าวันนัดอยู่ในอดีต
@@ -73,12 +73,12 @@ export default function ProfilePage() {
     const afternoonEnd = 13 * 60; // 13:00
 
     // รองรับ format "morning"/"afternoon" และ "HH:MM"
-    const isMorning = appointmentTime.toLowerCase() === 'morning' || 
-                      (appointmentTime.includes(':') && parseInt(appointmentTime.split(':')[0]) < 12);
-    
+    const isMorning = appointmentTime.toLowerCase() === 'morning' ||
+      (appointmentTime.includes(':') && parseInt(appointmentTime.split(':')[0]) < 12);
+
     if (isMorning && currentTimeInMinutes > morningEnd) return true;
     if (!isMorning && currentTimeInMinutes > afternoonEnd) return true;
-    
+
     return false;
   };
 
@@ -103,7 +103,7 @@ export default function ProfilePage() {
       if (editForm.phone_number) body.phone_number = editForm.phone_number;
       if (editForm.password) body.password = editForm.password;
 
-      const res = await fetch("/api/user/update", {
+      const res = await fetch("/api/users/update", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -151,13 +151,13 @@ export default function ProfilePage() {
 
   const can_confirm = (appointmentTime: string, appointmentDate: string) => {
     if (!appointmentDate || !appointmentTime) return false;
-    
+
     const now = new Date();
     const apDateStr = appointmentDate.split('T')[0];
     const [apYear, apMonth, apDay] = apDateStr.split('-').map(Number);
     const apDate = new Date(apYear, apMonth - 1, apDay);
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    
+
     // ต้องเป็นวันนัดเท่านั้น
     if (apDate.getTime() !== today.getTime()) return false;
 
@@ -169,9 +169,9 @@ export default function ProfilePage() {
     const afternoonEnd = 13 * 60;   // 13:00
 
     // รองรับ format "morning"/"afternoon" และ "HH:MM"
-    const isMorning = appointmentTime.toLowerCase() === 'morning' || 
-                      (appointmentTime.includes(':') && parseInt(appointmentTime.split(':')[0]) < 12);
-    
+    const isMorning = appointmentTime.toLowerCase() === 'morning' ||
+      (appointmentTime.includes(':') && parseInt(appointmentTime.split(':')[0]) < 12);
+
     if (isMorning) {
       return currentTimeInMinutes >= morningStart && currentTimeInMinutes <= morningEnd;
     } else {
@@ -208,8 +208,8 @@ export default function ProfilePage() {
   );
 
   const history = appointments.filter(ap =>
-    ap.status === "done" || 
-    ap.status === "cancel" || 
+    ap.status === "done" ||
+    ap.status === "cancel" ||
     (is_expired(ap.date, ap.time) && ap.status !== "done")
   );
 
@@ -279,65 +279,66 @@ export default function ProfilePage() {
         <div className={styles.subSection}>
           <h3 className={styles.subTitle}>นัดที่กำลังจะมาถึง</h3>
 
-          {upcoming.length > 0 ? (upcoming.map((ap) => {const isConfirmable = can_confirm(ap.time, ap.date);
+          {upcoming.length > 0 ? (upcoming.map((ap) => {
+            const isConfirmable = can_confirm(ap.time, ap.date);
 
-              return (
-                <div key={ap.ap_id} className={styles.upcomingCard}>
-                  <div className={styles.countdownBanner}>
-                    {isConfirmable
-                      ? "✨ ขณะนี้เปิดให้กดยืนยันการมาตามนัดแล้ว"
-                      : "⌛ กรุณายืนยันในวันนัด (08:00-09:00 / 12:00-13:00)"}
+            return (
+              <div key={ap.ap_id} className={styles.upcomingCard}>
+                <div className={styles.countdownBanner}>
+                  {isConfirmable
+                    ? "✨ ขณะนี้เปิดให้กดยืนยันการมาตามนัดแล้ว"
+                    : "⌛ กรุณายืนยันในวันนัด (08:00-09:00 / 12:00-13:00)"}
+                </div>
+
+                <div className={styles.appointmentInfo}>
+                  <div className={styles.appointmentDate}>
+                    <h3 className={styles.dateText}>
+                      {ap.date?.split("T")[0]}
+                    </h3>
+                    <p className={styles.timeText}>เวลา {ap.time} น.</p>
+                    <span className={styles.statusBadge}>รอยืนยัน</span>
                   </div>
 
-                  <div className={styles.appointmentInfo}>
-                    <div className={styles.appointmentDate}>
-                      <h3 className={styles.dateText}>
-                        {ap.date?.split("T")[0]}
-                      </h3>
-                      <p className={styles.timeText}>เวลา {ap.time} น.</p>
-                      <span className={styles.statusBadge}>รอยืนยัน</span>
-                    </div>
-
-                    <div className={styles.appointmentDetails}>
-                      <p>
-                        <span className={styles.detailLabel}>แผนก:</span>
-                        <span className={styles.deptHighlight}>{DEPT_ICONS[ap.dno] || "🏥"}{" "} {ap.department_name || "แผนกทั่วไป"} </span>
-                      </p>
-                      <p><span className={styles.detailLabel}>รหัสนัด:</span>{" "}{ap.ap_id}</p>
-                    </div>
-                  </div>
-
-                  <div className={styles.appointmentActions}>
-                    <button className={styles.confirmButton}
-                      onClick={() => {
-                        if (!isConfirmable) {
-                          const isMorning = ap.time?.toLowerCase() === 'morning' || 
-                            (ap.time?.includes(':') && parseInt(ap.time.split(':')[0]) < 12);
-                          const timeSlot = isMorning ? "08:00-09:00 น." : "12:00-13:00 น.";
-                          alert(`ยังไม่ถึงเวลายืนยัน!\n\nกรุณากดยืนยันในวันนัด (${ap.date?.split('T')[0]})\nช่วงเวลา: ${timeSlot}`);
-                          return;
-                        }
-                        handle_status_update(ap.ap_id,"done");
-                      }}
-                      disabled={isActionLoading}>
-                      ยืนยันนัด
-                    </button>
-
-                    <button className={styles.rescheduleButton}
-                      onClick={() => alert("ระบบเลื่อนนัดกำลังพัฒนา")}>
-                      เลื่อนนัด
-                    </button>
-
-                    <button className={styles.cancelButton}
-                      onClick={() => handle_status_update(ap.ap_id,"cancel")}
-                      disabled={isActionLoading}>
-                      ยกเลิก
-                    </button>
+                  <div className={styles.appointmentDetails}>
+                    <p>
+                      <span className={styles.detailLabel}>แผนก:</span>
+                      <span className={styles.deptHighlight}>{DEPT_ICONS[ap.dno] || "🏥"}{" "} {ap.department_name || "แผนกทั่วไป"} </span>
+                    </p>
+                    <p><span className={styles.detailLabel}>รหัสนัด:</span>{" "}{ap.ap_id}</p>
                   </div>
                 </div>
-              );
-            })
-          ):(
+
+                <div className={styles.appointmentActions}>
+                  <button className={styles.confirmButton}
+                    onClick={() => {
+                      if (!isConfirmable) {
+                        const isMorning = ap.time?.toLowerCase() === 'morning' ||
+                          (ap.time?.includes(':') && parseInt(ap.time.split(':')[0]) < 12);
+                        const timeSlot = isMorning ? "08:00-09:00 น." : "12:00-13:00 น.";
+                        alert(`ยังไม่ถึงเวลายืนยัน!\n\nกรุณากดยืนยันในวันนัด (${ap.date?.split('T')[0]})\nช่วงเวลา: ${timeSlot}`);
+                        return;
+                      }
+                      handle_status_update(ap.ap_id, "done");
+                    }}
+                    disabled={isActionLoading}>
+                    ยืนยันนัด
+                  </button>
+
+                  <button className={styles.rescheduleButton}
+                    onClick={() => alert("ระบบเลื่อนนัดกำลังพัฒนา")}>
+                    เลื่อนนัด
+                  </button>
+
+                  <button className={styles.cancelButton}
+                    onClick={() => handle_status_update(ap.ap_id, "cancel")}
+                    disabled={isActionLoading}>
+                    ยกเลิก
+                  </button>
+                </div>
+              </div>
+            );
+          })
+          ) : (
             <div className={styles.noData}>
               ไม่มีรายการนัดหมายที่รอยืนยัน
             </div>
@@ -369,7 +370,7 @@ export default function ProfilePage() {
                 </span>
               </div>
             ))
-          ):(
+          ) : (
             <p className={styles.noData}>ยังไม่มีประวัติการนัดหมาย </p>
           )}
         </div>
