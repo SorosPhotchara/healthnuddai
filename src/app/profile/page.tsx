@@ -324,10 +324,6 @@ export default function ProfilePage() {
                     ยืนยันนัด
                   </button>
 
-                  <button className={styles.rescheduleButton}
-                    onClick={() => alert("ระบบเลื่อนนัดกำลังพัฒนา")}>
-                    เลื่อนนัด
-                  </button>
 
                   <button className={styles.cancelButton}
                     onClick={() => handle_status_update(ap.ap_id, "cancel")}

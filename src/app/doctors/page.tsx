@@ -165,36 +165,36 @@ export default function DoctorsPage() {
                     <li key={idx}>{service}</li>
                   ))}
                 </ul>
-              
+
               </div>
             ))}
           </div>
         )}
 
         {/* Doctors Grid */}
-       {activeTab === "doctors" && (
-  <div className={styles.doctorsGrid}>
-    {MOCK_DOCTORS.map((doctor) => (
-      <div key={doctor.id} className={styles.doctorCard}>
-        <div className={styles.doctorImage}>
-          {doctor.image ? (
-            <img src={doctor.image} alt={doctor.name} className={styles.doctorImg} />
-          ) : (
-            <div className={styles.imagePlaceholder}>👨‍⚕️</div>
-          )}
-        </div>
-        <div className={styles.doctorInfo}>
-          <h3 className={styles.doctorName}>{doctor.name}</h3>
-          <p className={styles.doctorDepartment}>{doctor.department}</p>
-          <p className={styles.doctorSpecialty}>{doctor.specialty}</p>
-          <p className={styles.doctorSchedule}>
-            🗓 {doctor.available_days} · {doctor.available_time}
-          </p>
-        </div>
-      </div>
-    ))}
-  </div>
-)}
+        {activeTab === "doctors" && (
+          <div className={styles.doctorsGrid}>
+            {MOCK_DOCTORS.map((doctor) => (
+              <div key={doctor.id} className={styles.doctorCard}>
+                <div className={styles.doctorImage}>
+                  {doctor.image ? (
+                    <img src={doctor.image} alt={doctor.name} className={styles.doctorImg} />
+                  ) : (
+                    <div className={styles.imagePlaceholder}>👨‍⚕️</div>
+                  )}
+                </div>
+                <div className={styles.doctorInfo}>
+                  <h3 className={styles.doctorName}>{doctor.name}</h3>
+                  <p className={styles.doctorDepartment}>{doctor.department}</p>
+                  <p className={styles.doctorSpecialty}>{doctor.specialty}</p>
+                  <p className={styles.doctorSchedule}>
+                    🗓 {doctor.available_days} · {doctor.available_time}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Footer */}
