@@ -12,6 +12,7 @@ interface User {
   role: string;
   birth_date: string;
   avatar_url?: string | null;
+  dno?: number | null;
 }
 
 interface AuthState {
