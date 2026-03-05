@@ -4,13 +4,14 @@ interface User {
   title: string;
   identification_number: string;
   email: string;
-  password?: string; // Optional because we don't always need to pass it back
+  password?: string;
   fname: string;
   lname: string;
   sex: string;
   phone_number: string;
   role: string;
   birth_date: string;
+  avatar_url?: string | null;
 }
 
 interface AuthState {
@@ -19,7 +20,7 @@ interface AuthState {
   set_user: (user: User | null) => void;
   login: (user: User) => void;
   logout: () => void;
-  load_user: () => Promise<void>; // Changed to Promise for async fetching
+  load_user: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -60,19 +61,16 @@ export const useAuthStore = create<AuthState>((set) => ({
       const data = await res.json();
 
       if (data.success && data.user) {
-        // Merge stored data with fresh DB data
+
         const updatedUser = { ...parsedUser, ...data.user };
 
-        // Update both LocalStorage and State
         localStorage.setItem("user", JSON.stringify(updatedUser));
         set({ user: updatedUser, isLoading: false });
       } else {
-        // If API fails, fallback to stored data
         set({ user: parsedUser, isLoading: false });
       }
     } catch (error) {
       console.error("Auth Load Error:", error);
-      // Fallback if server is down
       const fallbackUser = JSON.parse(storedUser);
       set({ user: fallbackUser, isLoading: false });
     }

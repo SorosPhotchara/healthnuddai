@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
     try {
-        // ดึงเลขบัตรจาก URL เช่น /api/users/check?id=1234567890123
         const searchParams = request.nextUrl.searchParams;
         const id = searchParams.get("id");
 
@@ -11,17 +10,32 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: "ข้อมูลไม่ถูกต้อง" }, { status: 400 });
         }
 
-        // ค้นหาในตาราง users ตามเลขบัตรประชาชน
+        // 🐧 Add avatar_url to your SELECT statement
         const result = await db.execute({
-            sql: `SELECT title, fname, lname, phone_number, sex, birth_date 
+            sql: `SELECT title, fname, lname, phone_number, sex, birth_date, avatar_url 
             FROM users 
             WHERE identification_number = ? LIMIT 1`,
             args: [id],
         });
 
         if (result.rows.length > 0) {
-            // ส่งข้อมูลกลับไปถ้าเจอ
-            return NextResponse.json({ success: true, user: result.rows[0] });
+            const user = result.rows[0];
+
+
+            let base64Image = null;
+            if (user.avatar_url) {
+
+                const buffer = Buffer.from(user.avatar_url as Uint8Array);
+                base64Image = `data:image/png;base64,${buffer.toString("base64")}`;
+            }
+
+            return NextResponse.json({
+                success: true,
+                user: {
+                    ...user,
+                    avatar_url: base64Image
+                }
+            });
         } else {
             return NextResponse.json({ success: false, message: "ไม่พบข้อมูล" }, { status: 404 });
         }
