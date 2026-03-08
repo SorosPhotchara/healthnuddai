@@ -223,155 +223,182 @@ export default function Dashboard() {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.wrapper}>
-        <aside className={styles.sidebar}>
-          <p className={styles.menuTitle}>เมนู</p>
-          <nav className={styles.menuList}>
-            <Link href="/" className={`${styles.menuItem} ${styles.menuItemActive}`}>
-              <span className={styles.menuIcon}>🏠</span>
-              หน้าหลัก
-            </Link>
-            <Link href="/profile" className={styles.menuItem}>
-              <span className={styles.menuIcon}>📅</span>
-              นัดหมายของฉัน
-            </Link>
-            <Link href="/booking" className={styles.menuItem}>
-              <span className={styles.menuIcon}>➕</span>
-              จองคิวใหม่
-            </Link>
-            <Link href="/profile" className={styles.menuItem}>
-              <span className={styles.menuIcon}>👤</span>
-              ข้อมูลของฉัน
-            </Link>
-          </nav>
+    <div className="min-h-screen bg-[#F7FFF4] flex justify-center items-center p-8">
+      <div className="max-w-4xl w-full">
+        <main className="flex flex-col gap-6">
 
-          {/* คิวของฉันวันนี้ */}
-          {user && (
-            <div className={styles.myQueueSection}>
-              <p className={styles.menuTitle}>🎫 คิวของฉัน</p>
-              {myConfirmedToday.length > 0 ? (
-                <div className={styles.myQueueList}>
-                  {myConfirmedToday.map((ap) => (
-                    <div key={ap.ap_id} className={styles.myQueueItem}>
-                      <span className={styles.myQueueCode}>{get_queue_code(ap)}</span>
-                      <span className={styles.myQueueDept}>{DEPT_ICONS[ap.dno] || "🏥"} {ap.department_name || "แผนกทั่วไป"}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className={styles.noQueue}>ยังไม่มีคิววันนี้</p>
-              )}
-            </div>
-          )}
-        </aside>
-
-        <main className={styles.mainContent}>
-          <div className={styles.welcomeCard}>
-            <h1 className={styles.welcomeTitle}>
+          {/* welcome */}
+          <div className="bg-gradient-to-r from-[#48bb98] to-[#5DB996] rounded-2xl p-8 shadow-sm">
+            <h1 className="text-2xl font-bold text-white">
               {user ? `สวัสดี, ${user.fname}!` : "ยินดีต้อนรับ!"}
             </h1>
-            <p className={styles.welcomeSubtitle}>
+
+            <p className="text-white font-bold mt-2 text-sm">
               {user
                 ? "ยินดีต้อนรับกลับมา วันนี้คุณต้องการนัดหมายอะไรไหม?"
-                : "เข้าสู่ระบบเพื่อจัดการนัดหมายของคุณ"
-              }
+                : "เข้าสู่ระบบเพื่อจัดการนัดหมายของคุณ"}
             </p>
           </div>
 
-          <div className={styles.statsGrid}>
-            <div className={styles.statCard}>
-              <div className={styles.statNumber}>{upcomingAppointments.length}</div>
-              <div className={styles.statLabel}>คิวที่รอดำเนินการ</div>
-            </div>
-            <div className={styles.statCard}>
-              <div className={styles.statNumber}>
-                {user?.role === "doctor" ? allConfirmedToday.length : myConfirmedToday.length}
+          {/* stats */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white rounded-xl p-6 text-center shadow-sm">
+              <div className="text-3xl font-bold text-[#3d9d82]">
+                {upcomingAppointments.length}
               </div>
-              <div className={styles.statLabel}>ยืนยันแล้ววันนี้</div>
+              <div className="text-sm text-gray-500">
+                คิวที่รอดำเนินการ
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 text-center shadow-sm">
+              <div className="text-3xl font-bold text-[#3d9d82]">
+                {user?.role === "doctor"
+                  ? allConfirmedToday.length
+                  : myConfirmedToday.length}
+              </div>
+              <div className="text-sm text-gray-500">
+                ยืนยันแล้ววันนี้
+              </div>
             </div>
           </div>
 
-          <div className={styles.appointmentsCard}>
-            <div className={styles.cardHeader}>
-              <h2 className={styles.cardTitle}>คิวนัดหมายที่กำลังจะมาถึง</h2>
+          {/* upcoming appointments */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="mb-4">
+              <h2 className="font-semibold text-lg text-gray-800">
+                คิวนัดหมายที่กำลังจะมาถึง
+              </h2>
             </div>
+
             {upcomingAppointments.length > 0 ? (
-              <div className={styles.appointmentList}>
+              <div className="flex flex-col gap-3">
                 {upcomingAppointments.map((ap) => {
-                  const { day, month } = format_date(ap.date);
+                  const { day, month } = format_date(ap.date)
+
                   return (
-                    <div key={ap.ap_id} className={styles.appointmentItem}>
-                      <div className={styles.appointmentDate}>
-                        <div className={styles.appointmentDay}>{day}</div>
-                        <div className={styles.appointmentMonth}>{month}</div>
-                      </div>
-                      <div className={styles.appointmentDetails}>
-                        <div className={styles.appointmentTitle}>
-                          {ap.title}{ap.fname} {ap.lname}
+                    <div
+                      key={ap.ap_id}
+                      className="grid grid-cols-[70px_1fr_auto] items-center gap-4 bg-gray-50 rounded-xl p-3"
+                    >
+
+                      {/* date */}
+                      <div className="bg-green-50 rounded-lg text-center p-2">
+                        <div className="font-bold text-lg">
+                          {day}
                         </div>
-                        <div className={styles.appointmentTime}>
+
+                        <div className="text-xs text-gray-500">
+                          {month}
+                        </div>
+                      </div>
+
+                      {/* detail */}
+                      <div>
+                        <div className="font-semibold">
+                          {ap.title} {ap.fname} {ap.lname}
+                        </div>
+
+                        <div className="text-sm text-gray-500">
                           {DEPT_ICONS[ap.dno] || "🏥"} {ap.department_name || "แผนกทั่วไป"} | เวลา {ap.time} น.
                         </div>
                       </div>
-                      <span className={`${styles.appointmentStatus} ${styles.statusPending}`}>
+
+                      {/* status */}
+                      <span className="text-xs bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full">
                         รอยืนยัน
                       </span>
+
                     </div>
-                  );
+                  )
                 })}
               </div>
             ) : (
-              <div className={styles.emptyState}>
-                <div className={styles.emptyIcon}>📋</div>
+              <div className="text-center py-6 text-gray-500">
+                <div className="text-3xl mb-2">📋</div>
+
                 <p>ยังไม่มีคิวนัดหมาย</p>
-                <Link href="/booking" className={styles.bookButton}>
+
+                <Link
+                  href="/booking"
+                  className="inline-block mt-4 bg-[#3d9d82] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#348f72]"
+                >
                   จองคิวเลย
                 </Link>
               </div>
             )}
           </div>
 
-          {/* ========== คิวที่ยืนยันแล้ว ========== */}
-          <div className={styles.appointmentsCard}>
-            <div className={styles.cardHeader}>
-              <h2 className={styles.cardTitle}>คิวที่ยืนยันแล้ววันนี้</h2>
+          {/* confirmed today */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="mb-4">
+              <h2 className="font-semibold text-lg text-gray-800">
+                คิวที่ยืนยันแล้ววันนี้
+              </h2>
             </div>
+
             {(() => {
-              const confirmedList = user?.role === "doctor" ? allConfirmedToday : myConfirmedToday;
+              const confirmedList =
+                user?.role === "doctor"
+                  ? allConfirmedToday
+                  : myConfirmedToday
+
               return confirmedList.length > 0 ? (
-                <div className={styles.appointmentList}>
+                <div className="flex flex-col gap-3">
                   {confirmedList.map((ap) => {
-                    const { day, month } = format_date(ap.date);
+                    const { day, month } = format_date(ap.date)
+
                     return (
-                      <div key={ap.ap_id} className={styles.appointmentItem}>
-                        <div className={`${styles.appointmentDate} ${styles.dateConfirmed}`}>
-                          <div className={styles.appointmentDay}>{day}</div>
-                          <div className={styles.appointmentMonth}>{month}</div>
-                        </div>
-                        <div className={styles.appointmentDetails}>
-                          <div className={styles.appointmentTitle}>
-                            {ap.title}{ap.fname} {ap.lname}
+                      <div
+                        key={ap.ap_id}
+                        className="grid grid-cols-[70px_1fr_auto] items-center gap-4 bg-gray-50 rounded-xl p-3"
+                      >
+
+                        {/* date */}
+                        <div className="bg-green-100 rounded-lg text-center p-2">
+                          <div className="font-bold text-lg">
+                            {day}
                           </div>
-                          <div className={styles.appointmentTime}>
+
+                          <div className="text-xs text-gray-500">
+                            {month}
+                          </div>
+                        </div>
+
+                        {/* detail */}
+                        <div>
+                          <div className="font-semibold">
+                            {ap.title} {ap.fname} {ap.lname}
+                          </div>
+
+                          <div className="text-sm text-gray-500">
                             {DEPT_ICONS[ap.dno] || "🏥"} {ap.department_name || "แผนกทั่วไป"} | เวลา {ap.time} น.
                           </div>
                         </div>
-                        <div className={styles.queueBadge}>
-                          <span className={styles.queueLabel}>คิว</span>
-                          <span className={styles.queueNumber}>{get_queue_code(ap)}</span>
+
+                        {/* queue */}
+                        <div className="text-center">
+                          <span className="block text-xs text-gray-500">
+                            คิว
+                          </span>
+
+                          <span className="font-bold text-[#3d9d82]">
+                            {get_queue_code(ap)}
+                          </span>
                         </div>
+
                       </div>
-                    );
+                    )
                   })}
                 </div>
               ) : (
-                <div className={styles.emptyState}>
-                  <p>ยังไม่มีคิวที่ยืนยันวันนี้</p>
+                <div className="text-center py-6 text-gray-500">
+                  ยังไม่มีคิวที่ยืนยันวันนี้
                 </div>
-              );
+              )
             })()}
           </div>
+
         </main>
       </div>
     </div>
