@@ -95,9 +95,7 @@ export default function LoginPage() {
                   required
                 />
               </div>
-              <Link href="" className={styles.link_to_reset}>
-                ลืมรหัสผ่าน
-              </Link>
+
               <button type="submit" className={styles.submitButton}>
                 เข้าสู่ระบบ
               </button>

@@ -600,7 +600,7 @@ const StaffQueuePage: React.FC = () => {
                   maxLength={13}
                   value={walkInForm.idNumber}
                   onChange={(e) => setWalkInForm(prev => ({ ...prev, idNumber: e.target.value.replace(/\D/g, "") }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5DB996] focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5DB996] focus:border-transparent text-black"
                   placeholder="กรอกเลข 13 หลัก"
                 />
               </div>
@@ -634,7 +634,7 @@ const StaffQueuePage: React.FC = () => {
                     type="text"
                     value={walkInForm.firstName}
                     onChange={(e) => setWalkInForm(prev => ({ ...prev, firstName: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5DB996] focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5DB996] focus:border-transparent text-black"
                     placeholder="ชื่อจริง"
                   />
                 </div>
@@ -644,7 +644,7 @@ const StaffQueuePage: React.FC = () => {
                     type="text"
                     value={walkInForm.lastName}
                     onChange={(e) => setWalkInForm(prev => ({ ...prev, lastName: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5DB996] focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5DB996] focus:border-transparent text-black"
                     placeholder="นามสกุล"
                   />
                 </div>
@@ -658,7 +658,7 @@ const StaffQueuePage: React.FC = () => {
                   maxLength={10}
                   value={walkInForm.phone}
                   onChange={(e) => setWalkInForm(prev => ({ ...prev, phone: e.target.value.replace(/\D/g, "") }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5DB996] focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5DB996] focus:border-transparent text-black"
                   placeholder="เบอร์โทรศัพท์ (ถ้ามี)"
                 />
               </div>
@@ -699,7 +699,7 @@ const StaffQueuePage: React.FC = () => {
                   type="date"
                   value={walkInForm.birthDate}
                   onChange={(e) => setWalkInForm(prev => ({ ...prev, birthDate: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5DB996] focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5DB996] focus:border-transparent text-black"
                 />
               </div>
 
