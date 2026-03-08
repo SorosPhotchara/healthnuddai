@@ -287,13 +287,13 @@
 }
 
 .btnSubmit {
-  background: #A7F3D0;
+  background: #5DB996;
   color: white;
 }
 
 /* Muted green matching your screenshot */
 .btnSubmit:hover {
-  background: #6EE7B7;
+  background: #399a73;
 }
 
 /* ==============================================
@@ -330,11 +330,15 @@
   border-radius: 24px;
   padding: 2.5rem;
   width: 100%;
-  max-width: 700px;
-  /* Made wider to fit the 2-column form layout properly */
-  max-height: 90vh;
+  max-width: 600px;
+  max-height: 95vh;
   overflow-y: auto;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.modalBoxWalkIn::-webkit-scrollbar {
+  display: none;
 }
 
 /* ==============================================
@@ -532,4 +536,108 @@
 .bpYearBtn:hover {
   border-color: #5DB996;
   color: #5DB996;
+}
+
+/* ==============================================
+   AppModal Styles
+   ============================================== */
+.modalIconWrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.modalIconSuccess { background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%); }
+.modalIconError   { background: linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%); }
+
+.modalSvg { width: 52px; height: 52px; }
+
+.modalCircle {
+  stroke: #5DB996;
+  stroke-width: 2.5;
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  animation: strokeDraw 0.5s ease 0.1s forwards;
+}
+
+.modalCheck {
+  stroke: #5DB996;
+  stroke-width: 3;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: strokeDraw 0.35s ease 0.5s forwards;
+}
+
+.modalCircleError {
+  stroke: #E53935;
+  stroke-width: 2.5;
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  animation: strokeDraw 0.5s ease 0.1s forwards;
+}
+
+.modalCross {
+  stroke: #E53935;
+  stroke-width: 3;
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: strokeDraw 0.35s ease 0.5s forwards;
+}
+
+@keyframes strokeDraw {
+  to { stroke-dashoffset: 0; }
+}
+
+.modalTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #2C3E50;
+  margin: 0;
+}
+
+.modalMessage {
+  font-size: 0.95rem;
+  color: #7F8C8D;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 300px;
+}
+
+.modalBtn {
+  margin-top: 0.75rem;
+  padding: 0.875rem 2.5rem;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s;
+  font-family: inherit;
+  width: 100%;
+}
+
+.modalBtnSuccess {
+  background: linear-gradient(135deg, #5DB996 0%, #4ca885 100%);
+  color: white;
+  box-shadow: 0 6px 20px rgba(93, 185, 150, 0.35);
+}
+
+.modalBtnSuccess:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(93, 185, 150, 0.45);
+}
+
+.modalBtnError {
+  background: linear-gradient(135deg, #E53935 0%, #EF5350 100%);
+  color: white;
+  box-shadow: 0 6px 20px rgba(229, 57, 53, 0.3);
+}
+
+.modalBtnError:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(229, 57, 53, 0.4);
 }
