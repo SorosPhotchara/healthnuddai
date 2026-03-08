@@ -129,74 +129,75 @@ export default function DoctorsPage() {
 
   return (
     <div className={styles.container}>
-      {/* Hero Section */}
-      <div className={styles.hero}>
-        <h1 className={styles.heroTitle}>ทีมแพทย์ผู้เชี่ยวชาญ</h1>
-        <p className={styles.heroSubtitle}>แพทย์มากประสบการณ์พร้อมดูแลคุณด้วยใจ</p>
-      </div>
-
-      {/* Tabs */}
-      <div className={styles.content}>
-        <div className={styles.tabs}>
-          <button
-            className={`${styles.tab} ${activeTab === "departments" ? styles.tabActive : ""}`}
-            onClick={() => set_active_tab("departments")}
-          >
-            แผนกทั้งหมด
-          </button>
-          <button
-            className={`${styles.tab} ${activeTab === "doctors" ? styles.tabActive : ""}`}
-            onClick={() => set_active_tab("doctors")}
-          >
-            แพทย์ทั้งหมด
-          </button>
+      <div className={styles.card}> 
+        {/* Hero Section */}
+        <div className={styles.hero}>
+          <h1 className={styles.heroTitle}>ทีมแพทย์ผู้เชี่ยวชาญ</h1>
+          <p className={styles.heroSubtitle}>แพทย์มากประสบการณ์พร้อมดูแลคุณด้วยใจ</p>
         </div>
 
-        {/* Departments Grid */}
-        {activeTab === "departments" && (
-          <div className={styles.departmentsGrid}>
-            {DEPARTMENTS.map((dept) => (
-              <div key={dept.id} className={styles.departmentCard}>
-                <div className={styles.departmentIcon}>{dept.icon}</div>
-                <h3 className={styles.departmentName}>{dept.name}</h3>
-                <p className={styles.doctorCount}>แพทย์ {dept.doctorCount} ท่าน</p>
-                <ul className={styles.servicesList}>
-                  {dept.services.map((service, idx) => (
-                    <li key={idx}>{service}</li>
-                  ))}
-                </ul>
-
-              </div>
-            ))}
+        {/* Tabs */}
+        <div className={styles.content}>
+          <div className={styles.tabs}>
+            <button
+              className={`${styles.tab} ${activeTab === "departments" ? styles.tabActive : ""}`}
+              onClick={() => set_active_tab("departments")}
+            >
+              แผนกทั้งหมด
+            </button>
+            <button
+              className={`${styles.tab} ${activeTab === "doctors" ? styles.tabActive : ""}`}
+              onClick={() => set_active_tab("doctors")}
+            >
+              แพทย์ทั้งหมด
+            </button>
           </div>
-        )}
 
-        {/* Doctors Grid */}
-        {activeTab === "doctors" && (
-          <div className={styles.doctorsGrid}>
-            {MOCK_DOCTORS.map((doctor) => (
-              <div key={doctor.id} className={styles.doctorCard}>
-                <div className={styles.doctorImage}>
-                  {doctor.image ? (
-                    <img src={doctor.image} alt={doctor.name} className={styles.doctorImg} />
-                  ) : (
-                    <div className={styles.imagePlaceholder}>👨‍⚕️</div>
-                  )}
+          {/* Departments Grid */}
+          {activeTab === "departments" && (
+            <div className={styles.departmentsGrid}>
+              {DEPARTMENTS.map((dept) => (
+                <div key={dept.id} className={styles.departmentCard}>
+                  <div className={styles.departmentIcon}>{dept.icon}</div>
+                  <h3 className={styles.departmentName}>{dept.name}</h3>
+                  <p className={styles.doctorCount}>แพทย์ {dept.doctorCount} ท่าน</p>
+                  <ul className={styles.servicesList}>
+                    {dept.services.map((service, idx) => (
+                      <li key={idx}>{service}</li>
+                    ))}
+                  </ul>
+
                 </div>
-                <div className={styles.doctorInfo}>
-                  <h3 className={styles.doctorName}>{doctor.name}</h3>
-                  <p className={styles.doctorDepartment}>{doctor.department}</p>
-                  <p className={styles.doctorSpecialty}>{doctor.specialty}</p>
-                  <p className={styles.doctorSchedule}>
-                    🗓 {doctor.available_days} · {doctor.available_time}
-                  </p>
+              ))}
+            </div>
+          )}
+
+          {/* Doctors Grid */}
+          {activeTab === "doctors" && (
+            <div className={styles.doctorsGrid}>
+              {MOCK_DOCTORS.map((doctor) => (
+                <div key={doctor.id} className={styles.doctorCard}>
+                  <div className={styles.doctorImage}>
+                    {doctor.image ? (
+                      <img src={doctor.image} alt={doctor.name} className={styles.doctorImg} />
+                    ) : (
+                      <div className={styles.imagePlaceholder}>👨‍⚕️</div>
+                    )}
+                  </div>
+                  <div className={styles.doctorInfo}>
+                    <h3 className={styles.doctorName}>{doctor.name}</h3>
+                    <p className={styles.doctorDepartment}>{doctor.department}</p>
+                    <p className={styles.doctorSpecialty}>{doctor.specialty}</p>
+                    <p className={styles.doctorSchedule}>
+                      🗓 {doctor.available_days} · {doctor.available_time}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-
       {/* Footer */}
       <footer className={styles.footer}>
         <p>© 2026 Software Development | สุขภาพนัดได้</p>

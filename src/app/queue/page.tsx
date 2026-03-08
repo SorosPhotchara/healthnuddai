@@ -98,13 +98,13 @@ export default function QueuePage() {
   }
 
   return (
-    <div className="min-h-screen bg-green-100 flex justify-center py-10">
-      <div className="bg-green-200 w-full max-w-5xl rounded-3xl p-8 shadow-xl">
+    <div className="min-h-screen flex justify-center py-10" style={{ background: "#F7FFF4" }}>
+      <div className="w-full max-w-5xl rounded-3xl p-8 shadow-xl" style={{ background: "#D6FBEC" }}>
         
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-green-700">คิวเรียลไทม์</h1>
-          <p className="text-green-600 text-sm">อัปเดตล่าสุด: {lastUpdate} (ทุก 30 วินาที)</p>
+          <h1 className="text-3xl font-bold" style={{ color: "#47AD84" }}>คิวเรียลไทม์</h1>
+          <p className="text-sm" style={{ color: "#47AD84" }}>อัปเดตล่าสุด: {lastUpdate} (ทุก 30 วินาที)</p>
         </div>
 
         {/* Grid */}
