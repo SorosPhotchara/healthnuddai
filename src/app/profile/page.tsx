@@ -14,6 +14,58 @@ const DEPT_ICONS: { [key: number]: string } = {
   6: "📋",
 };
 
+interface ModalConfig {
+  open: boolean;
+  type: "success" | "error" | "confirm";
+  title: string;
+  message: string;
+  onConfirm?: () => void;
+}
+
+function AppModal({ config, onClose }: { config: ModalConfig; onClose: () => void }) {
+  if (!config.open) return null;
+  const isSuccess = config.type === "success";
+  const isConfirm = config.type === "confirm";
+  const handleConfirm = () => { onClose(); config.onConfirm?.(); };
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalBox} onClick={(e) => e.stopPropagation()}>
+        <div className={`${styles.modalIconWrap} ${isSuccess ? styles.modalIconSuccess : isConfirm ? styles.modalIconConfirm : styles.modalIconError}`}>
+          {isSuccess ? (
+            <svg viewBox="0 0 52 52" className={styles.modalSvg}>
+              <circle cx="26" cy="26" r="25" fill="none" className={styles.modalCircle} />
+              <path fill="none" d="M14 27l7 7 17-17" strokeLinecap="round" strokeLinejoin="round" className={styles.modalCheck} />
+            </svg>
+          ) : isConfirm ? (
+            <svg viewBox="0 0 52 52" className={styles.modalSvg}>
+              <circle cx="26" cy="26" r="25" fill="none" className={styles.modalCircleConfirm} />
+              <path fill="none" d="M26 16 L26 28 M26 34 L26 36" strokeLinecap="round" className={styles.modalExclaim} />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 52 52" className={styles.modalSvg}>
+              <circle cx="26" cy="26" r="25" fill="none" className={styles.modalCircleError} />
+              <path fill="none" d="M16 16 L36 36 M36 16 L16 36" strokeLinecap="round" className={styles.modalCross} />
+            </svg>
+          )}
+        </div>
+        <h3 className={styles.modalTitle}>{config.title}</h3>
+        <p className={styles.modalMessage}>{config.message}</p>
+        {isConfirm ? (
+          <div className={styles.modalConfirmBtns}>
+            <button className={styles.modalBtnCancel} onClick={onClose}>ยกเลิก</button>
+            <button className={styles.modalBtnConfirmYes} onClick={handleConfirm}>ยืนยัน</button>
+          </div>
+        ) : (
+          <button className={`${styles.modalBtn} ${isSuccess ? styles.modalBtnSuccess : styles.modalBtnError}`} onClick={handleConfirm}>
+            {isSuccess ? "เยี่ยมเลย!" : "รับทราบ"}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function ProfilePage() {
   const router = useRouter();
   const { user, isLoading, load_user } = useAuthStore();
@@ -21,6 +73,12 @@ export default function ProfilePage() {
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [avatarPreview, set_avatar_preview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [modal, setModal] = useState<ModalConfig>({ open: false, type: "success", title: "", message: "" });
+  const showModal = (type: "success" | "error" | "confirm", title: string, message: string, onConfirm?: () => void) => {
+    setModal({ open: true, type, title, message, onConfirm });
+  };
+  const closeModal = () => setModal(prev => ({ ...prev, open: false }));
 
   const fetchAppointments = useCallback(async () => {
     if (user?.identification_number) {
@@ -170,9 +228,7 @@ export default function ProfilePage() {
   };
 
   const handle_status_update = async (ap_id: number, newStatus: string) => {
-    if (newStatus === "cancel") {
-      if (!window.confirm("คุณยืนยันที่จะยกเลิกนัดหมายนี้ใช่หรือไม่?")) return;
-    }
+  const doUpdate = async () => {
     setIsActionLoading(true);
     try {
       const res = await fetch("/api/booking/update", {
@@ -184,14 +240,25 @@ export default function ProfilePage() {
         setAppointments(prev =>
           prev.map(ap => ap.ap_id === ap_id ? { ...ap, status: newStatus } : ap)
         );
-        alert(newStatus === "done" ? "ยืนยันสำเร็จ! 🎉" : "ยกเลิกเรียบร้อย");
+        showModal(
+          "success",
+          newStatus === "done" ? "ยืนยันสำเร็จ! 🎉" : "ยกเลิกเรียบร้อย",
+          newStatus === "done" ? "ระบบได้รับการยืนยันของคุณแล้ว" : "ยกเลิกนัดหมายเรียบร้อยแล้ว"
+        );
       }
-    } catch (error) {
-      alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
+    } catch {
+      showModal("error", "เกิดข้อผิดพลาด", "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
     } finally {
       setIsActionLoading(false);
     }
   };
+
+  if (newStatus === "cancel") {
+    showModal("confirm", "ยืนยันการยกเลิก", "คุณต้องการยกเลิกนัดหมายนี้ใช่หรือไม่?", doUpdate);
+    return;
+  }
+  doUpdate();
+};
 
   const upcoming = appointments.filter(ap =>
     (!ap.status || ap.status === "pending") && !is_expired(ap.date, ap.time)
@@ -205,6 +272,7 @@ export default function ProfilePage() {
 
   return (
     <div className={styles.container}>
+      <AppModal config={modal} onClose={closeModal} />
       {/* ================= PROFILE CARD ================= */}
       <div className={styles.profileCard}>
         <div className={styles.avatarSection}>
@@ -287,7 +355,7 @@ export default function ProfilePage() {
                   </div>
                 </div>
                 <div className={styles.appointmentActions}>
-                  <button className={styles.confirmButton} onClick={() => isConfirmable ? handle_status_update(ap.ap_id, "done") : alert("ยังไม่ถึงเวลายืนยัน")} disabled={isActionLoading}>ยืนยันนัด</button>
+                  <button className={styles.confirmButton} onClick={() => isConfirmable ? handle_status_update(ap.ap_id, "done") : showModal("error", "ยังไม่ถึงเวลา", "กรุณายืนยันในช่วงเวลานัดของวันนัดหมาย")} disabled={isActionLoading}>ยืนยันนัด</button>
                   <button className={styles.cancelButton} onClick={() => handle_status_update(ap.ap_id, "cancel")} disabled={isActionLoading}>ยกเลิก</button>
                 </div>
               </div>

@@ -20,6 +20,45 @@ interface Patient {
   identification_number?: string;
 }
 
+interface ModalConfig {
+  open: boolean;
+  type: "success" | "error";
+  title: string;
+  message: string;
+  onConfirm?: () => void;
+}
+
+function AppModal({ config, onClose }: { config: ModalConfig; onClose: () => void }) {
+  if (!config.open) return null;
+  const isSuccess = config.type === "success";
+  const handleConfirm = () => { onClose(); config.onConfirm?.(); };
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalBox} onClick={(e) => e.stopPropagation()}>
+        <div className={`${styles.modalIconWrap} ${isSuccess ? styles.modalIconSuccess : styles.modalIconError}`}>
+          {isSuccess ? (
+            <svg viewBox="0 0 52 52" className={styles.modalSvg}>
+              <circle cx="26" cy="26" r="25" fill="none" className={styles.modalCircle} />
+              <path fill="none" d="M14 27l7 7 17-17" strokeLinecap="round" strokeLinejoin="round" className={styles.modalCheck} />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 52 52" className={styles.modalSvg}>
+              <circle cx="26" cy="26" r="25" fill="none" className={styles.modalCircleError} />
+              <path fill="none" d="M16 16 L36 36 M36 16 L16 36" strokeLinecap="round" className={styles.modalCross} />
+            </svg>
+          )}
+        </div>
+        <h3 className={styles.modalTitle}>{config.title}</h3>
+        <p className={styles.modalMessage}>{config.message}</p>
+        <button className={`${styles.modalBtn} ${isSuccess ? styles.modalBtnSuccess : styles.modalBtnError}`} onClick={handleConfirm}>
+          {isSuccess ? "เยี่ยมเลย!" : "รับทราบ"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 const StaffQueuePage: React.FC = () => {
   const router = useRouter();
   const { user, isLoading, load_user } = useAuthStore();
@@ -28,6 +67,12 @@ const StaffQueuePage: React.FC = () => {
   const [waitingList, setWaitingList] = useState<Patient[]>([]);
   const [servingTime, setServingTime] = useState<number>(0);
   const [loading, setLoading] = useState(true);
+
+  const [modal, setModal] = useState<ModalConfig>({ open: false, type: "success", title: "", message: "" });
+  const showModal = (type: "success" | "error", title: string, message: string, onConfirm?: () => void) => {
+    setModal({ open: true, type, title, message, onConfirm });
+  };
+  const closeModal = () => setModal(prev => ({ ...prev, open: false }));
 
   // สร้างรหัสคิวโดยอิงจากแผนกและ ap_id
   const getQueueCode = (dno: number, ap_id: number) => {
@@ -149,7 +194,7 @@ const StaffQueuePage: React.FC = () => {
 
   const handleNext = async () => {
     if (waitingList.length === 0) {
-      alert("ไม่มีคิวถัดไป");
+      showModal("error", "ไม่มีคิวถัดไป", "ขณะนี้ไม่มีคิวรอให้บริการแล้ว");
       return;
     }
 
@@ -191,7 +236,7 @@ const StaffQueuePage: React.FC = () => {
       `กรุณาเข้าพบแพทย์แผนก${deptName} คิวหมายเลข ${currentQueue.token}`
     );
     
-    alert(`เรียกซ้ำคิว ${currentQueue.token}`);
+    showModal("success", "เรียกซ้ำแล้ว", `เรียกซ้ำคิว ${currentQueue.token} เรียบร้อย`);
   };
 
   const handleSkip = async () => {
@@ -258,6 +303,7 @@ const StaffQueuePage: React.FC = () => {
   if (isLoading || loading) {
     return (
       <div className={styles.container}>
+        <AppModal config={modal} onClose={closeModal} />
         <div className={styles.mainCard}>
           <p style={{ textAlign: "center", padding: "2rem" }}>กำลังโหลด...</p>
         </div>
@@ -268,6 +314,7 @@ const StaffQueuePage: React.FC = () => {
   if (!user?.dno) {
     return (
       <div className={styles.container}>
+        <AppModal config={modal} onClose={closeModal} />
         <div className={styles.mainCard}>
           <p style={{ textAlign: "center", padding: "2rem", color: "#ef4444" }}>
             ไม่พบข้อมูลแผนกของคุณ กรุณาติดต่อผู้ดูแลระบบ
@@ -279,6 +326,7 @@ const StaffQueuePage: React.FC = () => {
 
   return (
     <div className={styles.container}>
+      <AppModal config={modal} onClose={closeModal} />
       <div className={styles.mainCard}>
         <div className={styles.displaySection}>
           <span className={styles.deptTitle}>แผนก{DEPT_NAMES[user.dno] || `แผนก ${user.dno}`}</span>
