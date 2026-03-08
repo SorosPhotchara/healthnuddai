@@ -246,7 +246,7 @@ export default function Dashboard() {
               <div className="text-3xl font-bold text-[#3d9d82]">
                 {upcomingAppointments.length}
               </div>
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-[#6b7280]">
                 คิวที่รอดำเนินการ
               </div>
             </div>
@@ -257,7 +257,7 @@ export default function Dashboard() {
                   ? allConfirmedToday.length
                   : myConfirmedToday.length}
               </div>
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-[#6b7280]">
                 ยืนยันแล้ววันนี้
               </div>
             </div>
@@ -266,7 +266,7 @@ export default function Dashboard() {
           {/* upcoming appointments */}
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <div className="mb-4">
-              <h2 className="font-semibold text-lg text-gray-800">
+              <h2 className="font-semibold text-lg text-[#1f2937]">
                 คิวนัดหมายที่กำลังจะมาถึง
               </h2>
             </div>
@@ -283,23 +283,23 @@ export default function Dashboard() {
                     >
 
                       {/* date */}
-                      <div className="bg-green-50 rounded-lg text-center p-2">
-                        <div className="font-bold text-lg">
+                      <div className="bg-[#f0fdf4] rounded-lg text-center p-2">
+                        <div className="font-bold text-lg text-[#374151]">
                           {day}
                         </div>
 
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-[#6b7280]">
                           {month}
                         </div>
                       </div>
 
                       {/* detail */}
                       <div>
-                        <div className="font-semibold">
+                        <div className="font-semibold text-[#374151]">
                           {ap.title} {ap.fname} {ap.lname}
                         </div>
 
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-[#6b7280]">
                           {DEPT_ICONS[ap.dno] || "🏥"} {ap.department_name || "แผนกทั่วไป"} | เวลา {ap.time} น.
                         </div>
                       </div>
@@ -314,7 +314,7 @@ export default function Dashboard() {
                 })}
               </div>
             ) : (
-              <div className="text-center py-6 text-gray-500">
+              <div className="text-center py-6 text-[#6b7280]">
                 <div className="text-3xl mb-2">📋</div>
 
                 <p>ยังไม่มีคิวนัดหมาย</p>
@@ -332,7 +332,7 @@ export default function Dashboard() {
           {/* confirmed today */}
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <div className="mb-4">
-              <h2 className="font-semibold text-lg text-gray-800">
+              <h2 className="font-semibold text-lg text-[#1f2937]">
                 คิวที่ยืนยันแล้ววันนี้
               </h2>
             </div>
@@ -355,30 +355,30 @@ export default function Dashboard() {
                       >
 
                         {/* date */}
-                        <div className="bg-green-100 rounded-lg text-center p-2">
-                          <div className="font-bold text-lg">
+                        <div className="bg-[#dcfce7] rounded-lg text-center p-2">
+                          <div className="font-bold text-lg text-[#374151]">
                             {day}
                           </div>
 
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-[#6b7280]">
                             {month}
                           </div>
                         </div>
 
                         {/* detail */}
                         <div>
-                          <div className="font-semibold">
+                          <div className="font-semibold text-[#374151]">
                             {ap.title} {ap.fname} {ap.lname}
                           </div>
 
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-[#6b7280]">
                             {DEPT_ICONS[ap.dno] || "🏥"} {ap.department_name || "แผนกทั่วไป"} | เวลา {ap.time} น.
                           </div>
                         </div>
 
                         {/* queue */}
                         <div className="text-center">
-                          <span className="block text-xs text-gray-500">
+                          <span className="block text-xs text-[#6b7280]">
                             คิว
                           </span>
 
@@ -392,7 +392,7 @@ export default function Dashboard() {
                   })}
                 </div>
               ) : (
-                <div className="text-center py-6 text-gray-500">
+                <div className="text-center py-6 text-[#6b7280]">
                   ยังไม่มีคิวที่ยืนยันวันนี้
                 </div>
               )

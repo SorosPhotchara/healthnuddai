@@ -401,10 +401,24 @@ export default function BookingPage() {
     setSelectedTime(time);
   };
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     if (currentStep === 1 && selectedDept) {
       setCurrentStep(2);
-    } else if (currentStep === 2 && selectedDate && selectedTime) {
+    } else if (currentStep === 2 && selectedDate && selectedTime && selectedDept) {
+      // Re-check quota before proceeding
+      try {
+        const dateStr = format_local_date(selectedDate);
+        const res = await fetch(`/api/booking/quota?departmentId=${selectedDept}&date=${dateStr}&period=${selectedTime}`);
+        const data = await res.json();
+        if (data.success && data.data.remaining <= 0) {
+          showModal("error", "คิวเต็มแล้ว", "คิวในช่วงเวลานี้เต็มแล้ว กรุณาเลือกช่วงเวลาอื่น");
+          setSelectedTime(null);
+          await fetchQuota(selectedDept, selectedDate); // Refresh quota display
+          return;
+        }
+      } catch (error) {
+        console.error("Error checking quota:", error);
+      }
       setCurrentStep(3);
     } else if (currentStep === 3 && isFormValid()) {
       setCurrentStep(4);
@@ -449,6 +463,21 @@ export default function BookingPage() {
   };
 
   const handleSubmit = async () => {
+    // Re-check quota before submitting
+    if (selectedDept && selectedDate && selectedTime) {
+      try {
+        const dateStr = format_local_date(selectedDate);
+        const res = await fetch(`/api/booking/quota?departmentId=${selectedDept}&date=${dateStr}&period=${selectedTime}`);
+        const data = await res.json();
+        if (data.success && data.data.remaining <= 0) {
+          showModal("error", "คิวเต็มแล้ว", "คิวในช่วงเวลานี้เต็มแล้ว กรุณาเลือกช่วงเวลาอื่น");
+          return;
+        }
+      } catch (error) {
+        console.error("Error re-checking quota:", error);
+      }
+    }
+
     const payload = {
       identificationNumber: formData.idNumber,
       time: selectedTime, 

@@ -75,6 +75,131 @@ export async function PATCH(request: NextRequest) {
             }
         }
 
+        // ถ้ายืนยันนัด เช็คว่าเป็นคิวแรกหรือป่าว ถ้าใช่ก็ส่งแจ้งเตือน
+        if (status === "done") {
+            try {
+                // นับจำนวนคิวที่ done แล้วก่อนหน้า ในวันเดียวกัน แผนกเดียวกัน ช่วงเดียวกัน
+                const countResult = await db.execute({
+                    sql: `SELECT COUNT(*) as cnt FROM appointments 
+                          WHERE date = ? AND departmentId = ? AND time = ? AND status = 'done' AND ap_id < ?`,
+                    args: [appointment.date, appointment.departmentId, appointment.time, ap_id],
+                });
+                
+                const countBefore = Number((countResult.rows[0] as any)?.cnt || 0);
+                const deptLetter = String.fromCharCode(64 + (appointment.departmentId || 1));
+                const queueCode = `${deptLetter}${String(ap_id).padStart(2, '0')}`;
+                
+                // ถ้าไม่มีคิวก่อนหน้า ผู้ใช้เป็นคิวแรก ส่งแจ้งเตือน
+                if (countBefore === 0) {
+                    await db.execute({
+                        sql: `INSERT INTO notifications (user_id, title, message, type, related_ap_id)
+                              VALUES (?, ?, ?, ?, ?)`,
+                        args: [
+                            appointment.identification_number,
+                            "🔔 ถึงคิวของคุณแล้ว!",
+                            `กรุณาเข้าพบแพทย์แผนก${deptName} คิวหมายเลข ${queueCode}`,
+                            "queue",
+                            ap_id,
+                        ],
+                    });
+                } 
+                // ถ้ามีคิวก่อนหน้า 1 คน เป็นคนถัดไป
+                else if (countBefore === 1) {
+                    await db.execute({
+                        sql: `INSERT INTO notifications (user_id, title, message, type, related_ap_id)
+                              VALUES (?, ?, ?, ?, ?)`,
+                        args: [
+                            appointment.identification_number,
+                            "🔔 เตรียมตัว! คุณอยู่ลำดับถัดไป",
+                            `คิว ${queueCode} แผนก${deptName} กรุณาเตรียมตัวรอเรียก`,
+                            "queue",
+                            ap_id,
+                        ],
+                    });
+                }
+
+                // หาคิวถัดไป (คนที่ done แล้วหลังคนปัจจุบัน)
+                const nextQueueResult = await db.execute({
+                    sql: `SELECT * FROM appointments 
+                          WHERE date = ? AND departmentId = ? AND time = ? AND status = 'done' AND ap_id > ?
+                          ORDER BY ap_id ASC LIMIT 1`,
+                    args: [appointment.date, appointment.departmentId, appointment.time, ap_id],
+                });
+
+                if (nextQueueResult.rows.length > 0) {
+                    const nextPatient = nextQueueResult.rows[0] as any;
+                    const nextQueueCode = `${deptLetter}${String(nextPatient.ap_id).padStart(2, '0')}`;
+
+                    await db.execute({
+                        sql: `INSERT INTO notifications (user_id, title, message, type, related_ap_id)
+                              VALUES (?, ?, ?, ?, ?)`,
+                        args: [
+                            nextPatient.identification_number,
+                            "🔔 เตรียมตัว! คุณอยู่ลำดับถัดไป",
+                            `คิว ${nextQueueCode} แผนก${deptName} กรุณาเตรียมตัวรอเรียก`,
+                            "queue",
+                            nextPatient.ap_id,
+                        ],
+                    });
+                }
+            } catch (queueNotifError) {
+                console.error("Queue notification error:", queueNotifError);
+            }
+        }
+
+        // ถ้าตรวจเสร็จ (completed) >แจ้งคิวถัดไปว่า "ถึงคิว" และคิวถัดไปอีกว่า "เตรียมตัว"
+        if (status === "completed") {
+            try {
+                const deptLetter = String.fromCharCode(64 + (appointment.departmentId || 1));
+
+                // หาคิวถัดไปที่ยัง done (ยังไม่ completed)
+                const nextQueueResult = await db.execute({
+                    sql: `SELECT * FROM appointments 
+                          WHERE date = ? AND departmentId = ? AND time = ? AND status = 'done' AND ap_id > ?
+                          ORDER BY ap_id ASC LIMIT 2`,
+                    args: [appointment.date, appointment.departmentId, appointment.time, ap_id],
+                });
+
+                // คนแรก = ถึงคิว
+                if (nextQueueResult.rows.length > 0) {
+                    const nextPatient = nextQueueResult.rows[0] as any;
+                    const nextQueueCode = `${deptLetter}${String(nextPatient.ap_id).padStart(2, '0')}`;
+
+                    await db.execute({
+                        sql: `INSERT INTO notifications (user_id, title, message, type, related_ap_id)
+                              VALUES (?, ?, ?, ?, ?)`,
+                        args: [
+                            nextPatient.identification_number,
+                            "🔔 ถึงคิวของคุณแล้ว!",
+                            `กรุณาเข้าพบแพทย์แผนก${deptName} คิวหมายเลข ${nextQueueCode}`,
+                            "queue",
+                            nextPatient.ap_id,
+                        ],
+                    });
+                }
+
+                // คนที่สอง = เตรียมตัว
+                if (nextQueueResult.rows.length > 1) {
+                    const secondPatient = nextQueueResult.rows[1] as any;
+                    const secondQueueCode = `${deptLetter}${String(secondPatient.ap_id).padStart(2, '0')}`;
+
+                    await db.execute({
+                        sql: `INSERT INTO notifications (user_id, title, message, type, related_ap_id)
+                              VALUES (?, ?, ?, ?, ?)`,
+                        args: [
+                            secondPatient.identification_number,
+                            "🔔 เตรียมตัว! คุณอยู่ลำดับถัดไป",
+                            `คิว ${secondQueueCode} แผนก${deptName} กรุณาเตรียมตัวรอเรียก`,
+                            "queue",
+                            secondPatient.ap_id,
+                        ],
+                    });
+                }
+            } catch (completedNotifError) {
+                console.error("Completed notification error:", completedNotifError);
+            }
+        }
+
         return NextResponse.json({ success: true });
     } catch (error) {
         console.error("Update error:", error);

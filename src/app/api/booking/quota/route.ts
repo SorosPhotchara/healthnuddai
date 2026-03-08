@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // ถ้าระบุช่วงเวลา → นับเฉพาะช่วงเวลานั้น
+    // ถ้าระบุช่วงเวลา → นับเฉพาะช่วงเวลานั้น (ไม่นับ walk-in)
     if (period) {
       const result = await db.execute({
         sql: `
@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
             AND date = ? 
             AND time = ?
             AND (status IS NULL OR status = 'pending' OR status = 'done')
+            AND (is_walkin IS NULL OR is_walkin = 0)
         `,
         args: [departmentId, date, period],
       });
@@ -47,7 +48,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // ถ้าไม่ระบุช่วงเวลา → คืนทั้ง morning และ afternoon
+    // ถ้าไม่ระบุช่วงเวลา → คืนทั้ง morning และ afternoon (ไม่นับ walk-in)
     const morningResult = await db.execute({
       sql: `
         SELECT COUNT(*) as booked 
@@ -56,6 +57,7 @@ export async function GET(request: NextRequest) {
           AND date = ? 
           AND time = 'morning'
           AND (status IS NULL OR status = 'pending' OR status = 'done')
+          AND (is_walkin IS NULL OR is_walkin = 0)
       `,
       args: [departmentId, date],
     });
@@ -68,6 +70,7 @@ export async function GET(request: NextRequest) {
           AND date = ? 
           AND time = 'afternoon'
           AND (status IS NULL OR status = 'pending' OR status = 'done')
+          AND (is_walkin IS NULL OR is_walkin = 0)
       `,
       args: [departmentId, date],
     });
