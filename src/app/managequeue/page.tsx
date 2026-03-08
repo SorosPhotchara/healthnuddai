@@ -533,7 +533,7 @@ const StaffQueuePage: React.FC = () => {
         </div>
 
         <div className={styles.listSection}>
-          <div className="flex justify-between items-end border-b-2 pb-3 mb-4">
+          <div className="flex justify-between items-center border-b-2 pb-3 mb-4">
             <h3 className={styles.listHeaderTitle}>ลำดับคิวรอตรวจ</h3>
             <span className="text-lg font-bold text-[#5DB996]">
               {waitingList.length} คนในระบบ
