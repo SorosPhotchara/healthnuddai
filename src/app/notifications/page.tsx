@@ -29,7 +29,7 @@ const TYPE_ICON: Record<NotificationType, string> = {
 
 // แปลงเวลาเป็นข้อความ "...ที่แล้ว"
 function formatTimeAgo(dateStr: string): string {
-  const date = new Date(dateStr);
+  const date = new Date(dateStr.endsWith("Z") ? dateStr : dateStr + "Z");
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
@@ -51,6 +51,8 @@ export default function NotificationsPage() {
   const [filter, setFilter] = useState<"all" | "unread">("all");
   const [loading, setLoading] = useState(true);
 
+
+
   // ดึงข้อมูลแจ้งเตือนจาก API
   const fetchNotifications = useCallback(async () => {
     if (!user?.identification_number) return;
@@ -68,6 +70,15 @@ export default function NotificationsPage() {
       setLoading(false);
     }
   }, [user?.identification_number]);
+
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTick(t => t + 1);
+      fetchNotifications();
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [fetchNotifications]);
 
   useEffect(() => {
     load_user();
